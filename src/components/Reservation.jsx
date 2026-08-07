@@ -292,19 +292,57 @@ function InfosPratiques() {
 /** Carte interactive, chargée en différé pour ne pas ralentir la page. */
 function CarteLocalisation() {
   const reveal = useReveal()
+  const [chargee, setChargee] = useState(false)
   const { lat, lng } = infos.coordonnees
   const delta = 0.006
   const bbox = `${lng - delta}%2C${lat - delta / 2}%2C${lng + delta}%2C${lat + delta / 2}`
 
   return (
-    <div ref={reveal.ref} className={`${reveal.className} mt-20 border border-sable`}>
-      <iframe
-        title="Carte de localisation du restaurant La Tour à Montady"
-        loading="lazy"
-        className="block h-[380px] w-full sm:h-[440px]"
-        style={{ filter: 'grayscale(0.35) sepia(0.12) contrast(1.05)' }}
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`}
-      />
+    <div
+      ref={reveal.ref}
+      className={`${reveal.className} mt-20 border border-sable bg-creme-fonce`}
+    >
+      {chargee ? (
+        <iframe
+          title="Carte de localisation du restaurant La Tour à Montady"
+          className="block h-[380px] w-full sm:h-[440px]"
+          style={{ filter: 'grayscale(0.35) sepia(0.12) contrast(1.05)' }}
+          src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`}
+        />
+      ) : (
+        /* La carte ne se charge qu'à la demande : aucun appel à un service
+           tiers tant que le visiteur ne l'a pas décidé, et l'adresse reste
+           lisible même derrière un bloqueur ou hors connexion. */
+        <div className="flex h-[380px] flex-col items-center justify-center gap-5 px-6 text-center sm:h-[440px]">
+          <IconeEpingle className="text-3xl text-ocre" />
+
+          <p className="text-sm leading-relaxed text-nuit/70">
+            {infos.adresse.rue}
+            <br />
+            {infos.adresse.codePostal} {infos.adresse.ville}
+          </p>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => setChargee(true)}
+              className="btn-contour !px-6 !py-3 text-nuit hover:!bg-nuit hover:!text-creme"
+            >
+              Afficher la carte
+            </button>
+            <a
+              href={infos.liens.itineraire}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-principal !px-6 !py-3"
+            >
+              Itinéraire <IconeFleche />
+            </a>
+          </div>
+
+          <p className="mt-1 text-xs text-nuit/45">Carte fournie par OpenStreetMap.</p>
+        </div>
+      )}
     </div>
   )
 }
