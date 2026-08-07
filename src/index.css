@@ -1,0 +1,218 @@
+@import 'tailwindcss';
+
+/* Polices auto-hébergées : aucun appel à Google Fonts (rapidité + conformité RGPD) */
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/300-italic.css';
+@import '@fontsource-variable/inter';
+
+/* ==========================================================================
+   CHARTE GRAPHIQUE — point unique de réglage
+   Toute la direction artistique du site tient dans ce bloc. Pour ajuster la
+   palette (par ex. pour coller exactement aux couleurs de l'ancien site),
+   il suffit de modifier ces valeurs : tout le site suit.
+   ========================================================================== */
+@theme {
+  /* Fonds sombres, texte principal */
+  --color-nuit: #1b1917;
+  --color-nuit-doux: #262220;
+
+  /* Fonds clairs : crème pierre calcaire */
+  --color-creme: #f7f2e9;
+  --color-creme-fonce: #ede4d6;
+  --color-sable: #dccfb8;
+
+  /* Accent principal : ocre de la tour sarrasine (boutons, liens, chiffres) */
+  --color-ocre: #b5793f;
+  --color-ocre-clair: #c99460;
+
+  /* Accent secondaire : vert profond de l'étang et des vignes */
+  --color-vert: #3a4a3f;
+
+  /* Filets et détails précieux */
+  --color-or: #d8b26a;
+
+  /* Typographie : serif pour le cachet, sans-serif pour la lisibilité */
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Courbe d'animation unique : douce, haut de gamme, jamais rebondissante */
+  --ease-douce: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compense la hauteur du menu fixe lors des ancres */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-creme);
+    color: var(--color-nuit);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* Focus visible et élégant, indispensable à l'accessibilité clavier */
+  :focus-visible {
+    outline: 2px solid var(--color-ocre);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-ocre);
+    color: var(--color-creme);
+  }
+}
+
+@layer components {
+  /* Le petit sur-titre en capitales espacées, signature du site */
+  .surtitre {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* Bouton principal : ocre plein, léger soulèvement au survol */
+  .btn-principal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 2.25rem;
+    background-color: var(--color-ocre);
+    color: var(--color-creme);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid var(--color-ocre);
+    transition:
+      background-color 0.4s var(--ease-douce),
+      transform 0.4s var(--ease-douce),
+      box-shadow 0.4s var(--ease-douce);
+  }
+
+  .btn-principal:hover {
+    background-color: var(--color-ocre-clair);
+    border-color: var(--color-ocre-clair);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -12px rgb(27 25 23 / 0.55);
+  }
+
+  .btn-principal:active {
+    transform: translateY(0);
+  }
+
+  /* Bouton secondaire : contour fin, se remplit au survol */
+  .btn-contour {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 2.25rem;
+    color: currentColor;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    transition:
+      background-color 0.4s var(--ease-douce),
+      color 0.4s var(--ease-douce),
+      transform 0.4s var(--ease-douce);
+  }
+
+  .btn-contour:hover {
+    background-color: var(--color-creme);
+    color: var(--color-nuit);
+    transform: translateY(-2px);
+  }
+
+  /* Lien de navigation avec filet ocre qui se déploie au survol */
+  .lien-nav {
+    position: relative;
+    padding-block: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color 0.3s var(--ease-douce);
+  }
+
+  .lien-nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-or);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease-douce);
+  }
+
+  .lien-nav:hover::after,
+  .lien-nav[aria-current='true']::after {
+    transform: scaleX(1);
+  }
+}
+
+@layer utilities {
+  /* Apparition au défilement, pilotée par le hook useReveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s var(--ease-douce),
+      transform 0.9s var(--ease-douce);
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Filet doré décoratif utilisé sous les titres de section */
+  .filet-or {
+    display: block;
+    width: 3rem;
+    height: 1px;
+    background-color: var(--color-or);
+  }
+}
+
+/* Respect absolu de la préférence système : aucune animation imposée */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
