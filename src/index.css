@@ -191,6 +191,24 @@
     transform: none;
   }
 
+  /* Zoom très lent sur la photo du hero : donne de la vie au visuel sans
+     peser un octet. Prend le relais quand aucune vidéo n'est disponible.
+     L'aller-retour évite la coupure sèche d'une animation qui se termine. */
+  .zoom-lent {
+    animation: zoom-lent 32s ease-in-out infinite alternate;
+    transform-origin: 62% 55%;
+    will-change: transform;
+  }
+
+  @keyframes zoom-lent {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.09);
+    }
+  }
+
   /* Filet doré décoratif utilisé sous les titres de section */
   .filet-or {
     display: block;

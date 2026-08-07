@@ -1,18 +1,32 @@
+import { useEffect, useState } from 'react'
 import { infos } from '../data/infos'
 import { IconeTelephone } from './Icones'
 
 /**
- * Première impression du site : image plein écran, accroche, appel à l'action.
+ * Première impression du site : visuel plein écran, accroche, appel à l'action.
  *
- * Pour passer en fond vidéo, remplacer la balise <img> par :
- *   <video autoPlay muted loop playsInline poster="/images/hero.jpg"
- *          className="h-full w-full object-cover">
- *     <source src="/images/hero.mp4" type="video/mp4" />
- *   </video>
- * (garder le poster : il s'affiche pendant le chargement et sur mobile en
- * mode économie de données).
+ * Le fond fonctionne en deux temps :
+ *   1. la photo s'affiche immédiatement, avec un très lent zoom qui donne de la
+ *      vie sans rien coûter en bande passante ;
+ *   2. si les fichiers vidéo existent dans public/videos/, la vidéo se charge
+ *      par-dessus et prend le relais en fondu une fois prête.
+ *
+ * Conséquence utile : tant que les vidéos ne sont pas déposées, le hero reste
+ * exactement celui d'aujourd'hui. Rien à modifier dans le code le jour où on
+ * les ajoute — voir README, section « Le fond vidéo ».
  */
 export function Hero() {
+  const [videoPrete, setVideoPrete] = useState(false)
+  const [videoAutorisee, setVideoAutorisee] = useState(false)
+
+  useEffect(() => {
+    // On ne lance la vidéo ni pour qui demande moins d'animations, ni pour qui
+    // a activé l'économiseur de données sur son forfait mobile.
+    const animationsReduites = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const economieDonnees = navigator.connection?.saveData === true
+    setVideoAutorisee(!animationsReduites && !economieDonnees)
+  }, [])
+
   return (
     <section id="accueil" className="relative flex min-h-[100svh] items-center overflow-hidden">
       {/* Visuel de fond */}
@@ -20,9 +34,30 @@ export function Hero() {
         <img
           src="/images/hero.jpg"
           alt="La terrasse ombragée du restaurant La Tour, tables dressées face à la plaine de Montady"
-          className="h-full w-full object-cover"
+          className={`h-full w-full object-cover transition-opacity duration-1000 ${
+            videoPrete ? 'opacity-0' : 'opacity-100'
+          } ${videoAutorisee && !videoPrete ? 'zoom-lent' : ''}`}
           fetchPriority="high"
         />
+
+        {videoAutorisee && (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            onCanPlay={() => setVideoPrete(true)}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+              videoPrete ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <source src="/videos/hero.webm" type="video/webm" />
+            <source src="/videos/hero.mp4" type="video/mp4" />
+          </video>
+        )}
+
         {/* Double voile. Le premier assoit le bas de l'image, le second crée un
             fond sombre côté gauche : le texte reste lisible sur une photo de
             plein jour, sans éteindre la partie droite du visuel. */}
