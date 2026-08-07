@@ -8,8 +8,9 @@ import { infos } from '../data/infos'
  * réserver doivent rester à portée de pouce en permanence.
  * Elle apparaît une fois le hero dépassé, pour ne pas masquer l'image d'accueil.
  */
-export function BarreMobile() {
-  const visible = useDefilement(560)
+export function BarreMobile({ toujoursVisible = false }) {
+  const defile = useDefilement(560)
+  const visible = toujoursVisible || defile
 
   return (
     <div
@@ -25,7 +26,7 @@ export function BarreMobile() {
       </a>
 
       <a
-        href="#reservation"
+        href={toujoursVisible ? '/#reservation' : '#reservation'}
         className="flex items-center justify-center bg-ocre py-4 text-xs font-medium tracking-[0.16em] text-creme uppercase"
       >
         Réserver

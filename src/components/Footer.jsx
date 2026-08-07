@@ -54,7 +54,15 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {infos.nomComplet}. Tous droits réservés.
           </p>
-          <p>Mentions légales · Politique de confidentialité</p>
+          <nav className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2" aria-label="Liens secondaires">
+            <a href="/partenaires/" className="transition-colors duration-300 hover:text-or">
+              Partenaires
+            </a>
+            <span aria-hidden="true">·</span>
+            <span>Mentions légales</span>
+            <span aria-hidden="true">·</span>
+            <span>Politique de confidentialité</span>
+          </nav>
         </div>
       </div>
     </footer>
