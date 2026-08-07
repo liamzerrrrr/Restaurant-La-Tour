@@ -1,138 +1,158 @@
 /* ==========================================================================
- *  ⚠️  CONTENU PROVISOIRE — À REMPLACER PAR LA CARTE RÉELLE
+ *  Carte et menus du Restaurant La Tour.
+ *  Contenu repris fidèlement de la carte officielle fournie par la maison.
  *
- *  La carte du restaurant n'a pas pu être récupérée : la pièce jointe annoncée
- *  (photo/PDF du menu) n'est jamais arrivée dans la session, et le site actuel
- *  latourdemontady.com est inaccessible depuis l'environnement de build.
- *
- *  Les plats et les tarifs ci-dessous sont donc des EXEMPLES de remplissage,
- *  écrits dans l'esprit bistronomique et régional de la maison, uniquement
- *  destinés à valider la mise en page. Ils ne doivent en aucun cas être mis en
- *  ligne tels quels.
- *
- *  Pour intégrer la vraie carte : remplacer le contenu des tableaux ci-dessous.
- *  La structure des objets ne change pas, le rendu s'adapte automatiquement au
- *  nombre de plats. Puis passer `carteProvisoire` à false.
+ *  Seule réserve : les tarifs à l'unité des entrées ne figuraient pas sur le
+ *  document. Leur champ `prix` est donc à null — la mise en page les affiche
+ *  proprement sans prix. Il suffit de renseigner les valeurs pour qu'ils
+ *  apparaissent, aucune autre modification n'est nécessaire.
  * ========================================================================== */
 
-export const carteProvisoire = true
-
 /**
- * Formules et menus.
- * `lignes` : composition de la formule. `note` : conditions éventuelles.
+ * Les menus. `lignes` résume la composition ; le détail des plats se trouve
+ * dans les onglets de la carte, juste en dessous sur la page.
  */
 export const formules = [
   {
-    nom: 'Formule du Midi',
-    prix: '21',
-    lignes: ['Entrée + Plat', 'ou Plat + Dessert'],
-    note: 'Servie du lundi au vendredi midi, hors jours fériés.',
+    nom: 'Le Découverte',
+    prix: '34,90',
+    lignes: ['Une entrée au choix', 'Un plat au choix', 'Assiette de fromages ou dessert'],
+    note: 'Berlingot ou picanha de veau, puis bar sauvage ou taureau de Camargue.',
     miseEnAvant: false,
   },
   {
-    nom: 'Menu du Marché',
-    prix: '26',
-    lignes: ['Entrée', 'Plat', 'Dessert'],
-    note: 'Composé chaque matin selon le retour du marché.',
+    nom: 'L’Oppidum',
+    prix: '40,90',
+    lignes: [
+      'Une entrée au choix',
+      'Un plat au choix',
+      'Assiette de fromages',
+      'Dessert au choix',
+    ],
+    note: 'Trois entrées et trois plats au choix, dont le retour du chef.',
     miseEnAvant: true,
   },
   {
-    nom: 'Menu Découverte',
-    prix: '42',
-    lignes: ['Mise en bouche', 'Entrée', 'Plat', 'Fromages affinés', 'Dessert'],
-    note: 'Servi pour l’ensemble de la table, midi et soir.',
+    nom: 'Le Dégustation',
+    prix: '69,00',
+    lignes: [
+      'Makis de canard fermier',
+      'Homard bleu',
+      'Le retour du chef',
+      'Assiette de fromages',
+      'Dessert au choix',
+    ],
+    note: 'Cinq services. Ce menu doit être choisi par toutes les personnes de la table.',
+    miseEnAvant: false,
+  },
+  {
+    nom: 'Menu Enfant',
+    prix: '12,00',
+    lignes: ['Fingers de poulet ou filet de poisson et frites', 'Crème chocolat ou glace', 'Un sirop au choix'],
+    note: 'Jusqu’à 12 ans.',
     miseEnAvant: false,
   },
 ]
 
-/** Sections de la carte. Chaque plat : nom, description, prix (en euros). */
+/** Sections de la carte. `prix` à null = tarif non communiqué. */
 export const sections = [
   {
     id: 'entrees',
-    titre: 'Entrées',
+    titre: 'Les Entrées',
     plats: [
       {
-        nom: 'Velouté de courge muscade',
-        description: 'Châtaignes torréfiées, crème fouettée au thym citron',
-        prix: '12',
+        nom: 'Le Berlingot',
+        description:
+          'de betterave au chèvre de Combebelle, éclat croustillant, sorbet betterave-framboise, ketchup réduit',
+        prix: null,
       },
       {
-        nom: 'Tartare de daurade royale',
-        description: 'Agrumes du Roussillon, huile d’olive de Bouzigues, aneth',
-        prix: '16',
+        nom: 'Le Bras de Poupe',
+        description:
+          'en médaillon et gelée de crustacés, aïoli blanco andalou, perles de hareng fumé, chips de guanciale',
+        prix: null,
       },
       {
-        nom: 'Œuf parfait à 63°',
-        description: 'Émulsion de cèpes, lard paysan grillé, jeunes pousses',
-        prix: '14',
+        nom: 'Les Makis de Canard Fermier',
+        description: 'mousseline de foie gras à la truffe',
+        prix: null,
       },
       {
-        nom: 'Terrine de campagne maison',
-        description: 'Cornichons croquants, chutney d’oignons doux des Cévennes',
-        prix: '11',
+        nom: 'La Picanha de Veau',
+        description: 'en basse température comme un vitello tonnato, sablé parmesan',
+        prix: null,
+      },
+      {
+        nom: 'Le Thon Rouge',
+        description: 'de Méditerranée en mosaïque fumé minute et crème d’artichauts barigoule',
+        prix: null,
       },
     ],
   },
   {
     id: 'plats',
-    titre: 'Plats',
+    titre: 'Les Plats Chauds',
     plats: [
       {
-        nom: 'Filet de bœuf de l’Aubrac',
-        description: 'Pomme fondante, jus corsé au vin de Faugères, légumes de saison',
-        prix: '29',
+        nom: 'Le Taureau de Camargue',
+        description: 'en noisette, jus réduit à la sangria',
+        prix: '24',
       },
       {
-        nom: 'Dos de cabillaud rôti sur peau',
-        description: 'Risotto crémeux au safran, coquillages de l’étang de Thau',
-        prix: '26',
-      },
-      {
-        nom: 'Souris d’agneau confite sept heures',
-        description: 'Écrasé de pomme de terre à l’huile d’olive, romarin et ail doux',
+        nom: 'Le Croustillant de Pigeonneau',
+        description: 'bardé au foie gras, gastrique aux fruits rouges',
         prix: '25',
       },
       {
-        nom: 'Suprême de volaille fermière',
-        description: 'Gratin dauphinois, jus perlé à l’estragon',
-        prix: '23',
+        nom: 'Le Dos de Bar Sauvage',
+        description: 'sur peau, jus de coquillages monté au beurre noisette',
+        prix: '24',
       },
       {
-        nom: 'Risotto de petit épeautre',
-        description: 'Légumes racines glacés, copeaux de brebis des Pyrénées',
-        prix: '20',
-        vegetarien: true,
+        nom: 'Le Dos de Cabillaud Skrei',
+        description: 'sauce tamarin',
+        prix: '25',
+      },
+      {
+        nom: 'Le Retour du Chef',
+        description: 'selon son humeur, viande de race ou de chasse — suggestion à demander',
+        prix: '26',
+      },
+      {
+        nom: 'Le Homard Bleu',
+        description: 'crème iodée et salicornes',
+        prix: '43',
       },
     ],
   },
   {
     id: 'desserts',
-    titre: 'Desserts',
+    titre: 'Fromages & Desserts',
     plats: [
       {
-        nom: 'Tarte fine aux pommes',
-        description: 'Caramel au beurre salé, glace vanille de Madagascar',
-        prix: '10',
+        nom: 'Assiette de Fromages',
+        description: 'sélection affinée',
+        prix: '9',
       },
       {
-        nom: 'Cœur coulant au chocolat noir',
-        description: 'Grand cru 70 %, crème anglaise à la fève tonka',
-        prix: '11',
+        nom: 'La Pavlova',
+        description: 'aux fraises de région et fruits rouges, chiboust à la stracciatella',
+        prix: '9',
       },
       {
-        nom: 'Baba imbibé au Muscat de Frontignan',
-        description: 'Chantilly légère, agrumes confits',
-        prix: '11',
+        nom: 'Le Finger Chocolat',
+        description: 'grand cru, cœur crémeux aux éclats de caramel et cacahuètes torréfiées',
+        prix: '9',
       },
       {
-        nom: 'Assiette de fromages affinés',
-        description: 'Sélection de la région, confiture de figues maison',
-        prix: '12',
+        nom: 'La Pêche Texturée',
+        description: 'autour d’un cheesecake crémeux, gel citron et sorbet pêche',
+        prix: '9',
       },
     ],
   },
 ]
 
-/** Mention légale affichée sous la carte. */
+/** Mention affichée sous la carte, reprise du document de la maison. */
 export const mentionCarte =
-  'Nos plats sont élaborés sur place à partir de produits bruts, frais et de saison. La carte évolue au fil du marché : certaines suggestions du jour ne figurent pas ici. Pour toute allergie ou régime particulier, prévenez-nous lors de la réservation.'
+  'Le « fait maison » impose de commander votre dessert en même temps que votre plat. La carte évolue au fil des saisons : certaines suggestions du jour ne figurent pas ici. Pour toute allergie ou régime particulier, prévenez-nous lors de la réservation.'

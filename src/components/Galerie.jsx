@@ -8,22 +8,22 @@ import { useReveal } from '../hooks/useReveal'
 const visuels = [
   {
     src: '/images/galerie-1.jpg',
-    alt: 'Assiette dressée : dos de cabillaud rôti et risotto safrané',
+    alt: 'La picanha de veau en vitello tonnato, sablé parmesan, copeaux de fromage et pensée',
     classe: 'sm:col-span-2 sm:row-span-2 aspect-[4/5] sm:aspect-auto',
   },
   {
     src: '/images/galerie-2.jpg',
-    alt: 'Vue panoramique sur l’étang asséché de Montady depuis la terrasse',
+    alt: 'Dos de poisson rôti sur peau, crumble d’herbes et jus de coquillages',
     classe: 'sm:col-span-2 aspect-[4/3]',
   },
   {
     src: '/images/galerie-3.jpg',
-    alt: 'Détail d’un dressage en cuisine',
+    alt: 'Flambée en cuisine : poêlée saisie à la flamme au-dessus du feu',
     classe: 'aspect-square',
   },
   {
     src: '/images/galerie-4.jpg',
-    alt: 'Table dressée avec vue sur la tour sarrasine',
+    alt: 'Entrée dressée à l’assiette, quenelle, fleurs comestibles et condiments',
     classe: 'aspect-square',
   },
 ]

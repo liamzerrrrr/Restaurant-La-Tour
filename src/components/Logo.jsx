@@ -1,39 +1,39 @@
 /**
- * Logo provisoire : tour sarrasine stylisée + typographie de la maison.
+ * Logo de la maison, redessiné en vectoriel d'après la carte du restaurant :
+ * la ligne de colline surmontée de la tour, puis « La Tour » et « RESTAURANT ».
  *
- * La capture d'écran de l'ancien site n'ayant pas été fournie, le logo
- * d'origine n'a pas pu être repris. Ce dessin vectoriel tient lieu de
- * placeholder cohérent avec la charte. Pour brancher le vrai logo, remplacer
- * le <svg> par une balise <img src="/images/logo.svg" alt="Restaurant La Tour" />.
+ * Redessiné plutôt qu'extrait, pour rester net à toute taille et pouvoir
+ * prendre la couleur du contexte (crème sur fond sombre, cuivre sur crème).
+ * Si le fichier vectoriel d'origine est fourni, le remplacer est immédiat :
+ * <img src="/images/logo.svg" alt="Restaurant La Tour" />
  */
 export function Logo({ compact = false, className = '' }) {
   return (
-    <span className={`flex items-center gap-3 ${className}`}>
+    <span className={`flex flex-col items-center leading-none ${className}`}>
       <svg
-        viewBox="0 0 40 48"
+        viewBox="0 0 120 30"
         aria-hidden="true"
-        className={compact ? 'h-8 w-auto' : 'h-10 w-auto'}
+        className={`w-auto transition-all duration-500 ${compact ? 'h-3.5' : 'h-5'}`}
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="square"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
       >
-        {/* Créneaux */}
-        <path d="M11 12h3v-4h3v4h3v-4h3v4h3" />
-        {/* Corps de la tour */}
-        <path d="M11 12v28M29 12v28" />
-        {/* Ouvertures */}
-        <path d="M17 20h6M17 27h6" />
-        {/* Porte en plein cintre */}
-        <path d="M16 40v-6a4 4 0 0 1 8 0v6" />
-        {/* Sol */}
-        <path d="M4 40h32" />
+        {/* La colline, la tour à son sommet, puis la retombée vers la plaine */}
+        <path d="M2 26c14-.6 26-3 35-8l7-4h4v-6h3.5V4h7v4H62v6h4l7 4c9 5 21 7.4 35 8" />
       </svg>
 
-      <span className="flex flex-col leading-none">
-        <span className="font-display text-2xl tracking-[0.18em] uppercase">La Tour</span>
-        <span className="surtitre mt-1 text-[0.5rem] opacity-70">Montady</span>
+      <span
+        className={`font-display italic tracking-wide transition-all duration-500 ${
+          compact ? 'mt-1 text-xl' : 'mt-1.5 text-2xl'
+        }`}
+      >
+        La Tour
       </span>
+
+      <span className="surtitre mt-1 text-[0.5rem] opacity-70">Restaurant</span>
     </span>
   )
 }

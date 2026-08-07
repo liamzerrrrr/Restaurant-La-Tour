@@ -19,13 +19,15 @@ export function Hero() {
       <div className="absolute inset-0">
         <img
           src="/images/hero.jpg"
-          alt="La salle du restaurant La Tour ouverte sur le panorama de l'étang de Montady"
+          alt="La terrasse ombragée du restaurant La Tour, tables dressées face à la plaine de Montady"
           className="h-full w-full object-cover"
           fetchPriority="high"
         />
-        {/* Double voile : lisibilité du texte en bas à gauche, sans écraser l'image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-nuit via-nuit/45 to-nuit/25" />
-        <div className="absolute inset-0 bg-gradient-to-r from-nuit/70 via-transparent to-transparent" />
+        {/* Double voile. Le premier assoit le bas de l'image, le second crée un
+            fond sombre côté gauche : le texte reste lisible sur une photo de
+            plein jour, sans éteindre la partie droite du visuel. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-nuit via-nuit/35 to-nuit/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-nuit/90 via-nuit/45 to-transparent" />
       </div>
 
       <div className="relative mx-auto w-full max-w-7xl px-5 pt-32 pb-28 sm:px-8 sm:pb-32">
@@ -41,16 +43,16 @@ export function Hero() {
             className="mt-6 font-display text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.95] text-creme"
             style={{ animation: 'apparition 1.1s cubic-bezier(0.16,1,0.3,1) 0.35s both' }}
           >
-            Une cuisine de la main,
-            <span className="block italic font-light text-or">une vue sans pareille.</span>
+            Une cuisine de saison,
+            <span className="block font-light text-or italic">face aux vignes.</span>
           </h1>
 
           <p
             className="mt-7 max-w-xl text-base leading-relaxed text-creme/85 sm:text-lg"
             style={{ animation: 'apparition 1.1s cubic-bezier(0.16,1,0.3,1) 0.55s both' }}
           >
-            Au pied de la tour sarrasine, face au grand cercle de l’étang asséché, nous servons une
-            cuisine 100 % faite maison — produits frais, locaux, cueillis au rythme des saisons.
+            Des saveurs authentiques et raffinées, composées à partir de produits locaux et de
+            saison, servies en salle ou en terrasse face au grand paysage de l’étang de Montady.
           </p>
 
           <div

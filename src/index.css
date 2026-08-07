@@ -9,29 +9,32 @@
 
 /* ==========================================================================
    CHARTE GRAPHIQUE — point unique de réglage
-   Toute la direction artistique du site tient dans ce bloc. Pour ajuster la
-   palette (par ex. pour coller exactement aux couleurs de l'ancien site),
-   il suffit de modifier ces valeurs : tout le site suit.
+   Toute la direction artistique du site tient dans ce bloc.
+
+   Les valeurs ci-dessous sont relevées directement sur les supports de la
+   maison (carte PDF, logo) : le fond sombre chaud, la crème rosée et le
+   cuivre du logo et des bandeaux. Modifier ici suffit : tout le site suit.
    ========================================================================== */
 @theme {
-  /* Fonds sombres, texte principal */
-  --color-nuit: #1b1917;
-  --color-nuit-doux: #262220;
+  /* Fond sombre chaud de la carte */
+  --color-nuit: #22201d;
+  --color-nuit-doux: #2b2825;
+  --color-nuit-profond: #171512;
 
-  /* Fonds clairs : crème pierre calcaire */
-  --color-creme: #f7f2e9;
-  --color-creme-fonce: #ede4d6;
-  --color-sable: #dccfb8;
+  /* Crème rosée des panneaux clairs */
+  --color-creme: #f0e3da;
+  --color-creme-fonce: #e3d3c6;
+  --color-sable: #cdb7a5;
 
-  /* Accent principal : ocre de la tour sarrasine (boutons, liens, chiffres) */
-  --color-ocre: #b5793f;
-  --color-ocre-clair: #c99460;
+  /* Accent principal : le cuivre du logo (boutons, liens, prix) */
+  --color-ocre: #a85736;
+  --color-ocre-clair: #c87f55;
 
-  /* Accent secondaire : vert profond de l'étang et des vignes */
-  --color-vert: #3a4a3f;
+  /* Cuivre pâle : filets, sur-titres et détails sur fond sombre */
+  --color-or: #d5ab93;
 
-  /* Filets et détails précieux */
-  --color-or: #d8b26a;
+  /* Accent secondaire, discret (mention végétarien) */
+  --color-vert: #4a5140;
 
   /* Typographie : serif pour le cachet, sans-serif pour la lisibilité */
   --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;

@@ -16,8 +16,8 @@ export function Footer() {
           <Logo />
 
           <p className="max-w-md text-sm leading-relaxed text-creme/55">
-            Cuisine faite maison, produits frais et de saison, face au panorama de l’étang de
-            Montady et au pied de la tour sarrasine.
+            Une cuisine de saison face aux vignes. Des saveurs authentiques et raffinées, à partir
+            de produits locaux, servies en salle ou en terrasse.
           </p>
 
           <div className="flex gap-4">

@@ -5,24 +5,17 @@ React + Vite + Tailwind CSS v4, sans dépendance externe au chargement.
 
 ---
 
-## ⚠️ À lire avant toute mise en ligne
+## État du contenu
 
-Deux pièces jointes étaient annoncées dans la commande — **la carte du
-restaurant** et **une capture d'écran du site actuel** — mais elles ne sont pas
-arrivées avec le message. Le site actuel `latourdemontady.com` est par ailleurs
-inaccessible depuis l'environnement de développement (blocage réseau).
+Le site tourne avec **le contenu réel de la maison** : la carte et les quatre
+menus sont repris de la carte officielle, les photos viennent du dossier Drive
+et du site existant, la charte est relevée sur les supports du restaurant.
 
-Trois éléments sont donc **provisoires** et doivent être remplacés :
+Un seul point reste en attente :
 
-| Élément | Où | Ce qu'il faut faire |
+| Élément | Où | Ce qu'il manque |
 |---|---|---|
-| **La carte et les tarifs** | `src/data/menu.js` | Remplacer les plats d'exemple par la carte réelle, puis passer `carteProvisoire` à `false`. |
-| **La palette** | `src/index.css`, bloc `@theme` | Ajuster les couleurs pour coller à la charte existante. Tout le site suit automatiquement. |
-| **Les photos et le logo** | `public/images/`, `src/components/Logo.jsx` | Écraser les fichiers par les vraies photos (mêmes noms). |
-
-En revanche, **les informations pratiques sont réelles** et ont été vérifiées :
-adresse, téléphone, horaires, Instagram, noms du chef et du chef exécutif.
-Elles sont regroupées dans `src/data/infos.js`.
+| Tarifs à l'unité des entrées | `src/data/menu.js` | Le document fourni ne les indiquait pas. Le champ `prix` de chaque entrée est à `null` et la mise en page les affiche proprement sans prix. Renseigner la valeur suffit à les faire apparaître. |
 
 ---
 
@@ -42,34 +35,39 @@ Vercel, o2switch, OVH ou n'importe quel hébergeur classique.
 
 ## Direction artistique
 
-**Ambiance** — élégante, épurée, chaleureuse. On laisse respirer : beaucoup de
-blanc tournant, des images en grand format, peu d'éléments par écran.
+**Palette** — relevée directement sur la carte PDF et le logo de la maison, pas
+inventée. Elle vit dans un seul bloc `@theme` de `src/index.css` : modifier ces
+valeurs suffit, tout le site suit.
 
-**Palette** (`src/index.css`, bloc `@theme`) — inspirée du lieu lui-même : la
-pierre ocre de la tour sarrasine, le vert des vignes et de l'étang, la crème du
-calcaire languedocien.
-
-| Jeton | Valeur | Usage |
+| Jeton | Valeur | Origine / usage |
 |---|---|---|
-| `--color-nuit` | `#1B1917` | Texte principal, fonds sombres (carte, pied de page) |
-| `--color-creme` | `#F7F2E9` | Fond clair dominant |
-| `--color-creme-fonce` | `#EDE4D6` | Fond de la galerie, survols |
-| `--color-sable` | `#DCCFB8` | Bordures, filets de séparation |
-| `--color-ocre` | `#B5793F` | **Accent principal** : boutons, liens, sur-titres |
-| `--color-ocre-clair` | `#C99460` | Survol des boutons |
-| `--color-vert` | `#3A4A3F` | Accent secondaire (mention végétarien) |
-| `--color-or` | `#D8B26A` | Filets précieux, prix, détails |
+| `--color-nuit` | `#22201D` | Fond sombre chaud de la carte |
+| `--color-nuit-doux` | `#2B2825` | Aplats secondaires |
+| `--color-creme` | `#F0E3DA` | Crème rosée des panneaux clairs |
+| `--color-creme-fonce` | `#E3D3C6` | Fond de la galerie, survols |
+| `--color-sable` | `#CDB7A5` | Bordures et filets |
+| `--color-ocre` | `#A85736` | **Le cuivre du logo** : boutons, liens, sur-titres |
+| `--color-ocre-clair` | `#C87F55` | Survol des boutons |
+| `--color-or` | `#D5AB93` | Cuivre pâle : filets, prix, détails sur fond sombre |
 
-**Typographie** — le couple demandé, serif pour le cachet + sans-serif pour la
-lisibilité :
+Il n'y a volontairement **aucun doré** : la marque est entièrement construite
+sur le cuivre, du logo aux bandeaux de la carte.
 
-- **Titres** : Cormorant Garamond. Une didone humaniste, très déliée, qui donne
-  immédiatement le registre « table soignée » sans tomber dans le pompeux.
-- **Textes** : Inter. Neutre, taillée pour l'écran, parfaitement lisible à
-  petite taille sur mobile.
+**Typographie** — Cormorant Garamond pour les titres, Inter pour les textes,
+les deux auto-hébergées (paquets Fontsource, aucun appel à Google Fonts :
+chargement plus rapide et conformité RGPD acquise).
 
-Les deux polices sont **auto-hébergées** (paquets Fontsource) : aucun appel à
-Google Fonts. Chargement plus rapide et conformité RGPD acquise.
+> À noter : les supports imprimés de la maison utilisent plutôt une grande
+> linéale à fort interlettrage pour les titres. Le serif a été retenu ici parce
+> qu'il apportait le cachet demandé, et l'esprit de la marque est repris par les
+> sur-titres en capitales espacées (classe `.surtitre`). Basculer entièrement
+> sur une linéale ne demande que de changer `--font-display`.
+
+**Logo** — redessiné en vectoriel d'après la carte (`src/components/Logo.jsx`) :
+la ligne de colline surmontée de la tour, puis « La Tour » et « RESTAURANT ».
+Redessiné plutôt qu'extrait, pour rester net à toute taille et prendre la
+couleur de son contexte. Si le fichier vectoriel d'origine est disponible, le
+remplacement est immédiat.
 
 ---
 
@@ -80,24 +78,23 @@ lui donne envie, puis on lui rend la réservation évidente.
 
 | # | Section | Fichier | Parti pris de mise en page |
 |---|---|---|---|
-| — | Navigation fixe | `Nav.jsx` | Transparente sur le hero, se compacte en barre sombre au défilement. Le lien de la section courante se souligne d'un filet doré. En dessous de 1024 px : menu plein écran. |
-| 1 | Hero | `Hero.jsx` | Image plein écran, texte calé en bas à gauche (l'œil y va naturellement), double voile dégradé pour garantir la lisibilité quelle que soit la photo. Deux actions : réserver, appeler. |
-| 2 | Le Concept & La Vue | `Concept.jsx` | Deux colonnes : visuel en portrait 4/5 avec vignette en débord d'un côté, récit + citation du chef de l'autre. En dessous, trois piliers numérotés (fait maison / local / saison). |
-| 3 | La Carte | `Carte.jsx` | **Fond sombre** — c'est la respiration du parcours et ça met les prix dorés en valeur. Les formules en trois cartes en haut, puis la carte en onglets (Entrées / Plats / Desserts) avec ligne de points à l'ancienne entre le plat et son prix. |
-| 4 | Galerie | `Galerie.jsx` | Grille asymétrique : deux grands formats portent la section, deux vignettes rythment. Léger zoom au survol. |
-| 5 | Réservation & Infos | `Reservation.jsx` | Le téléphone en premier, en gros, avant même le formulaire. Puis formulaire à gauche, horaires + adresse à droite, carte OpenStreetMap en pleine largeur. Le jour courant est surligné dans le tableau des horaires. |
+| — | Navigation fixe | `Nav.jsx` | Transparente sur le hero, se compacte en barre sombre au défilement. Le lien de la section courante se souligne d'un filet cuivre. En dessous de 1024 px : menu plein écran. |
+| 1 | Hero | `Hero.jsx` | Photo de la terrasse en plein écran, accroche calée en bas à gauche. Double voile dégradé : le texte reste lisible sur une photo de plein jour sans éteindre la droite du visuel. |
+| 2 | La Maison | `Concept.jsx` | Deux colonnes : la salle en portrait avec la table dressée en débord, le récit en regard. En dessous, trois piliers numérotés. |
+| 3 | La Carte | `Carte.jsx` | **Fond sombre**, comme la carte imprimée. Les quatre menus en cartes alignées, puis la carte en onglets (Entrées / Plats chauds / Fromages & desserts) avec ligne de points entre le plat et son prix. |
+| 4 | Galerie | `Galerie.jsx` | Grille asymétrique : la picanha de veau en grand format, le poisson en large, la flambée et une entrée en vignettes. |
+| 5 | Réservation & Infos | `Reservation.jsx` | Le téléphone en premier, en gros, avant le formulaire. Puis formulaire à gauche, horaires et adresse à droite, carte OpenStreetMap en pleine largeur. Le jour courant est surligné. |
 | — | Pied de page | `Footer.jsx` | Logo, réseaux sociaux, coordonnées. |
-| — | Barre mobile | `BarreMobile.jsx` | Barre fixe en bas d'écran (mobile uniquement) : **Appeler · Réserver**, toujours sous le pouce. Apparaît une fois le hero dépassé. |
+| — | Barre mobile | `BarreMobile.jsx` | Barre fixe en bas d'écran (mobile) : **Appeler · Réserver**, toujours sous le pouce. Apparaît une fois le hero dépassé. |
 
 ---
 
 ## Mobile first
 
-La majorité des réservations se font au téléphone, depuis un téléphone. Le site
-en tire les conséquences :
+La majorité des réservations se font au téléphone, depuis un téléphone :
 
 - **Barre d'action permanente** en bas d'écran (appeler / réserver).
-- Le numéro est un lien `tel:` partout où il apparaît — un appui, ça compose.
+- Le numéro est un lien `tel:` partout — un appui, ça compose.
 - Boutons pleine largeur, cibles tactiles d'au moins 44 px.
 - Menu de navigation plein écran, fermable à l'Échap comme au doigt.
 - Vérifié sans aucun débordement horizontal en 390 px de large.
@@ -107,27 +104,26 @@ en tire les conséquences :
 ## Micro-interactions
 
 Toutes calées sur une même courbe (`cubic-bezier(0.16, 1, 0.3, 1)`) : une
-décélération douce, jamais de rebond. C'est ce qui fait la différence entre
-« animé » et « haut de gamme ».
+décélération douce, jamais de rebond.
 
 - Apparition des blocs au défilement (`IntersectionObserver`, `useReveal`), avec
   des décalages en cascade sur les grilles.
 - Barre de navigation qui se compacte, lien de section courante souligné.
 - Boutons qui se soulèvent de 2 px au survol, avec ombre portée.
 - Zoom lent des images en galerie (1,4 s).
-- **`prefers-reduced-motion` respecté intégralement** : toute animation est
-  neutralisée pour les personnes qui en font la demande au niveau système.
+- **`prefers-reduced-motion` respecté intégralement.**
 
 ---
 
 ## Accessibilité
 
-- Contrastes conformes AA sur les textes courants.
-- Navigation clavier complète, focus visible en ocre.
+- Contrastes conformes AA sur les textes courants (cuivre `#A85736` sur crème :
+  ratio 4,67).
+- Navigation clavier complète, focus visible en cuivre.
 - Onglets de la carte en ARIA (`tablist` / `tab` / `tabpanel`) ; les panneaux
   inactifs restent dans le HTML, donc lisibles par Google.
 - Lien d'évitement en début de page.
-- Balises `alt` descriptives sur toutes les images.
+- Balises `alt` décrivant réellement chaque photo.
 
 ---
 
@@ -136,51 +132,54 @@ décélération douce, jamais de rebond. C'est ce qui fait la différence entre
 Il fonctionne **sans serveur** : sans configuration, il ouvre le logiciel de
 messagerie avec la demande pré-remplie.
 
-Pour recevoir les demandes directement par e-mail, créer un fichier `.env` :
+Pour recevoir les demandes par e-mail, créer un fichier `.env` :
 
 ```bash
 VITE_RESERVATION_ENDPOINT=https://formspree.io/f/xxxxxxxx
 ```
 
 Le formulaire enverra alors un POST JSON à cette adresse (Formspree, Brevo,
-Resend, Make, ou n'importe quel endpoint maison). Voir `.env.example`.
+Resend, Make, ou un endpoint maison). Voir `.env.example`.
 
-> Le formulaire est volontairement présenté comme une **demande**, pas comme une
-> confirmation : la table n'est réservée qu'une fois la réponse du restaurant
-> envoyée. C'est la formulation honnête, et elle évite les malentendus.
+> Le formulaire est présenté comme une **demande**, pas comme une confirmation :
+> la table n'est réservée qu'une fois la réponse du restaurant envoyée. C'est la
+> formulation honnête, et elle évite les malentendus.
 
 ---
 
 ## Les visuels
 
-Les fichiers de `public/images/` sont des **visuels provisoires générés**, tous
-marqués comme tels. Il suffit de les écraser en gardant les mêmes noms.
+Toutes les photos de `public/images/` sont des **photos réelles du restaurant**,
+recadrées aux formats de la maquette. Pour en changer, écraser le fichier en
+gardant le même nom.
 
-| Fichier | Format conseillé | Sujet |
+| Fichier | Format | Sujet |
 |---|---|---|
-| `hero.jpg` | 2400 × 1500 | La salle ou la terrasse avec la vue — l'image qui doit donner envie |
-| `salle.jpg` | 1200 × 1500 (portrait) | L'intérieur, tables dressées |
-| `terrasse.jpg` | 900 × 900 (carré) | La terrasse |
-| `galerie-1.jpg` | 1200 × 1500 (portrait) | Une assiette |
-| `galerie-2.jpg` | 1600 × 1200 | Le panorama de l'étang |
-| `galerie-3.jpg` | 900 × 900 | En cuisine |
-| `galerie-4.jpg` | 900 × 900 | Une table dressée |
-| `og-image.jpg` | 1200 × 630 | Aperçu lors des partages sur les réseaux |
+| `hero.jpg` | 1536 × 960 | La terrasse ombragée et la vue |
+| `salle.jpg` | 819 × 1024 | La salle, fauteuils de velours terracotta |
+| `terrasse.jpg` | 1024 × 1024 | Table dressée en terrasse |
+| `galerie-1.jpg` | 1080 × 1350 | La picanha de veau |
+| `galerie-2.jpg` | 1365 × 1024 | Dos de poisson sur peau |
+| `galerie-3.jpg` | 1080 × 1080 | Flambée en cuisine |
+| `galerie-4.jpg` | 1080 × 1080 | Entrée dressée à l'assiette |
+| `og-image.jpg` | 1200 × 630 | Aperçu lors des partages |
 
-**Pour passer le hero en vidéo** : la marche à suivre est commentée en tête de
-`src/components/Hero.jsx`.
+Le dossier Drive contient aussi des originaux en très haute définition
+(`5X1A….jpg`, `DSC….jpg`) et une vidéo. Pour passer le hero en fond vidéo, la
+marche à suivre est commentée en tête de `src/components/Hero.jsx`.
 
 ---
 
 ## Référencement
 
-- Titre et description rédigés pour la recherche locale.
-- Données structurées `schema.org/Restaurant` complètes (horaires, téléphone,
-  adresse, coordonnées GPS) : Google peut afficher les horaires directement dans
-  les résultats.
+- Titre et description rédigés pour la recherche locale, à partir du discours de
+  la maison (« Une cuisine de saison face aux vignes »).
+- Données structurées `schema.org/Restaurant` complètes : horaires, téléphone,
+  adresse, coordonnées GPS, gamme de prix. Google peut afficher les horaires
+  directement dans les résultats.
 - Balises Open Graph pour les partages.
 - Langue `fr`, HTML sémantique, un seul `<h1>`.
 
-À faire à la mise en ligne : renseigner l'URL réelle dans les balises
-`canonical` et `og:image` de `index.html`, et rédiger les pages Mentions légales
-et Politique de confidentialité (obligatoires, liens présents en pied de page).
+À faire à la mise en ligne : vérifier l'URL dans les balises `canonical` et
+`og:image` de `index.html`, et rédiger les pages Mentions légales et Politique
+de confidentialité (obligatoires, liens présents en pied de page).

@@ -14,7 +14,7 @@ export function Carte() {
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 20% 15%, #d8b26a 0, transparent 45%), radial-gradient(circle at 85% 80%, #b5793f 0, transparent 40%)',
+            'radial-gradient(circle at 20% 15%, #d5ab93 0, transparent 45%), radial-gradient(circle at 85% 80%, #a85736 0, transparent 40%)',
         }}
       />
 
@@ -22,13 +22,13 @@ export function Carte() {
         <TitreSection
           clair
           centre
-          surtitre="La carte"
+          surtitre="La carte & les menus"
           titre="Ce que l’on sert aujourd’hui"
-          chapo="Une carte courte, qui change avec le marché. C’est la condition pour que tout reste frais et fait maison."
+          chapo="Quatre menus et une carte volontairement courte, qui évoluent avec les saisons. C’est la condition pour que tout reste frais et préparé sur place."
         />
 
         {/* Formules et menus */}
-        <div className="mt-16 grid gap-6 sm:mt-20 md:grid-cols-3">
+        <div className="mt-16 grid gap-6 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
           {formules.map((formule, i) => (
             <CarteFormule key={formule.nom} formule={formule} index={i} />
           ))}
@@ -132,9 +132,9 @@ function CarteFormule({ formule, index }) {
           <span className="ml-1 text-2xl">€</span>
         </p>
 
-        <p className="mt-4 min-h-[2.75rem] text-xs leading-relaxed text-creme/45">
-          {formule.note}
-        </p>
+        {/* Hauteur réservée pour la note la plus longue : sans elle, les prix
+            des quatre menus ne tomberaient pas sur la même ligne. */}
+        <p className="mt-4 min-h-[4rem] text-xs leading-relaxed text-creme/45">{formule.note}</p>
       </div>
     </div>
   )
@@ -153,13 +153,19 @@ function Plat({ plat }) {
           )}
         </h3>
 
-        {/* Ligne de points à l'ancienne, qui relie le plat à son prix */}
-        <span
-          aria-hidden="true"
-          className="mb-1 h-px flex-1 bg-[repeating-linear-gradient(to_right,rgba(247,242,233,0.28)_0_2px,transparent_2px_6px)]"
-        />
-
-        <span className="font-display text-xl text-or sm:text-2xl">{plat.prix} €</span>
+        {/* Ligne de points à l'ancienne, qui relie le plat à son prix.
+            Sans tarif communiqué, on n'affiche ni points ni prix. */}
+        {plat.prix && (
+          <>
+            <span
+              aria-hidden="true"
+              className="mb-1 h-px flex-1 bg-[repeating-linear-gradient(to_right,rgba(240,227,218,0.28)_0_2px,transparent_2px_6px)]"
+            />
+            <span className="font-display text-xl whitespace-nowrap text-or sm:text-2xl">
+              {plat.prix} €
+            </span>
+          </>
+        )}
       </div>
 
       <p className="mt-2 max-w-md text-sm leading-relaxed text-creme/55">{plat.description}</p>
