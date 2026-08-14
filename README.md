@@ -29,6 +29,21 @@ courante : Clan Campbell, Alaryk, Cabernet, acacia.
 
 ---
 
+## Déploiement
+
+Le dépôt est relié au projet Vercel **restaurant-la-tour**. La branche de
+production est `claude/restaurant-tour-website-t7ytzj` : chaque push la
+redéploie automatiquement, et rien n'est à configurer — Vercel détecte Vite,
+lance `npm run build` et sert `dist/`.
+
+Les deux pages sont de vrais fichiers HTML (`dist/index.html` et
+`dist/partenaires/index.html`), donc aucune règle de réécriture n'est
+nécessaire côté hébergeur.
+
+> Tant que le contenu n'est pas validé par le restaurant, mieux vaut activer la
+> protection par mot de passe du projet : un second site public identique peut
+> concurrencer `latourdemontady.com` dans les résultats de recherche.
+
 ## Démarrer
 
 ```bash
