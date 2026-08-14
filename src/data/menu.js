@@ -61,31 +61,31 @@ export const sections = [
     titre: 'Les Entrées',
     plats: [
       {
-        nom: 'Le Berlingot',
+        nom: 'Le Berlingot de Betterave',
         description:
-          'de betterave au chèvre de Combebelle, éclat croustillant, sorbet betterave-framboise, ketchup réduit',
-        prix: null,
-      },
-      {
-        nom: 'Le Bras de Poupe',
-        description:
-          'en médaillon et gelée de crustacés, aïoli blanco andalou, perles de hareng fumé, chips de guanciale',
-        prix: null,
-      },
-      {
-        nom: 'Les Makis de Canard Fermier',
-        description: 'mousseline de foie gras à la truffe',
-        prix: null,
+          'au chèvre de Combebelle, éclat croustillant, sorbet betterave-framboise, ketchup réduit',
+        prix: '19',
       },
       {
         nom: 'La Picanha de Veau',
         description: 'en basse température comme un vitello tonnato, sablé parmesan',
-        prix: null,
+        prix: '20',
       },
       {
-        nom: 'Le Thon Rouge',
-        description: 'de Méditerranée en mosaïque fumé minute et crème d’artichauts barigoule',
-        prix: null,
+        nom: 'Le Bras de Poulpe',
+        description:
+          'en médaillon et gelée de crustacés, ajoblanco andalou, perles de hareng fumé, chips de guanciale',
+        prix: '23',
+      },
+      {
+        nom: 'Les Makis de Canard Fermier',
+        description: 'mousseline de foie gras à la truffe',
+        prix: '23',
+      },
+      {
+        nom: 'Le Thon Rouge de Méditerranée',
+        description: 'en mosaïque fumé minute et crème d’artichauts barigoule',
+        prix: '23',
       },
     ],
   },

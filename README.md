@@ -15,11 +15,10 @@ La carte compte cinq onglets : les trois sections de plats (`src/data/menu.js`),
 les vins groupés par appellation (`src/data/vins.js`) et les boissons réparties
 par famille (`src/data/boissons.js`).
 
-Quatre points restent à confirmer par le restaurant :
+Trois points restent à confirmer par le restaurant :
 
 | Élément | Où | À vérifier |
 |---|---|---|
-| Tarifs à l'unité des entrées | `src/data/menu.js` | Non indiqués sur le document fourni. Le champ `prix` est à `null` : la mise en page affiche l'entrée sans prix ni ligne de points. Renseigner la valeur suffit à le faire apparaître. |
 | Digestifs | `src/data/boissons.js` | La carte imprimée annonce Get, Cognac/Calvados/Armagnac et **Loco Loco** ; le site actuel listait Menteuse, Croqueuse et Pulpeuse. La carte imprimée a été retenue. |
 | Cocktail « Summer Tour » | `src/data/boissons.js` | Présent sur la carte imprimée, absent du site actuel. Il a été conservé. |
 | Vins rosés | `src/data/vins.js` | Aucune page rosé dans les documents fournis. Les rosés n'apparaissent donc qu'au pichet. |
