@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TitreSection } from './TitreSection'
+import { PlanSalle } from './PlanSalle'
 import { useReveal } from '../hooks/useReveal'
 import { indexJourCourant, infos } from '../data/infos'
+import { trouverTable, zones } from '../data/salle'
+import { tablesOccupees } from '../data/disponibilites'
 import {
   IconeEpingle,
   IconeFleche,
@@ -31,15 +34,58 @@ const champVide = {
   date: '',
   service: 'soir',
   couverts: '2',
+  table: '',
   message: '',
 }
 
 export function Reservation() {
   const [valeurs, setValeurs] = useState(champVide)
   const [etat, setEtat] = useState('repos') // repos | envoi | succes | erreur
+  const [occupees, setOccupees] = useState(() => new Set())
+  const [chargementPlan, setChargementPlan] = useState(false)
+  const [zoneActive, setZoneActive] = useState(zones[0].id)
   const formulaire = useReveal()
 
   const majChamp = (e) => setValeurs((v) => ({ ...v, [e.target.name]: e.target.value }))
+
+  // « 13+ » n'est pas un nombre : au-delà de douze couverts, on renvoie au
+  // téléphone plutôt que de laisser choisir une table qui ne suffira pas.
+  const nombreCouverts = Number(valeurs.couverts)
+  const grandeTablee = !Number.isFinite(nombreCouverts)
+
+  // Disponibilités du jour et du service choisis
+  useEffect(() => {
+    if (!valeurs.date) {
+      setOccupees(new Set())
+      return undefined
+    }
+
+    let annule = false
+    setChargementPlan(true)
+
+    tablesOccupees(valeurs.date, valeurs.service).then((resultat) => {
+      if (annule) return
+      setOccupees(resultat)
+      setChargementPlan(false)
+    })
+
+    return () => {
+      annule = true
+    }
+  }, [valeurs.date, valeurs.service])
+
+  // Une table choisie peut cesser d'être valable si l'on change de date, de
+  // service ou de nombre de couverts : on la libère plutôt que de laisser
+  // partir une demande incohérente.
+  useEffect(() => {
+    if (!valeurs.table) return
+
+    const table = trouverTable(valeurs.table)
+    const invalide =
+      !table || occupees.has(valeurs.table) || grandeTablee || table.couverts < nombreCouverts
+
+    if (invalide) setValeurs((v) => ({ ...v, table: '' }))
+  }, [occupees, nombreCouverts, grandeTablee, valeurs.table])
 
   const envoyer = async (e) => {
     e.preventDefault()
@@ -84,9 +130,14 @@ export function Reservation() {
           </a>
         </div>
 
-        <div className="mt-20 grid gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+        {/* Le plan de salle a besoin de largeur : la colonne du formulaire
+            prend nettement le pas sur celle des informations pratiques. */}
+        <div className="mt-20 grid gap-14 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:gap-16">
           {/* ---------- Formulaire ---------- */}
-          <div ref={formulaire.ref} className={formulaire.className}>
+          {/* `min-w-0` est indispensable : sans lui, la largeur minimale du
+              plan de salle élargit sa colonne et fait déborder toute la page
+              horizontalement sur mobile. */}
+          <div ref={formulaire.ref} className={`${formulaire.className} min-w-0`}>
             <h3 className="font-display text-3xl text-nuit">Demande de réservation</h3>
 
             {etat === 'succes' ? (
@@ -106,82 +157,123 @@ export function Reservation() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={envoyer} className="mt-8 space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <Champ
-                    label="Nom"
-                    name="nom"
-                    value={valeurs.nom}
-                    onChange={majChamp}
-                    required
-                    autoComplete="name"
+              <form onSubmit={envoyer} className="mt-8 space-y-11">
+                {/* ---------- 1. Quand ? ---------- */}
+                <fieldset>
+                  <legend className="surtitre text-ocre">1 — Quand ?</legend>
+
+                  <div className="mt-6 grid gap-5 sm:grid-cols-3">
+                    <Champ
+                      label="Date"
+                      name="date"
+                      type="date"
+                      value={valeurs.date}
+                      onChange={majChamp}
+                      required
+                      min={aujourdhui}
+                    />
+
+                    <Champ
+                      label="Service"
+                      name="service"
+                      as="select"
+                      value={valeurs.service}
+                      onChange={majChamp}
+                    >
+                      {creneaux.map((c) => (
+                        <option key={c.valeur} value={c.valeur}>
+                          {c.libelle}
+                        </option>
+                      ))}
+                    </Champ>
+
+                    <Champ
+                      label="Couverts"
+                      name="couverts"
+                      as="select"
+                      value={valeurs.couverts}
+                      onChange={majChamp}
+                    >
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+                        <option key={n} value={String(n)}>
+                          {n} {n > 1 ? 'personnes' : 'personne'}
+                        </option>
+                      ))}
+                      <option value="13+">Plus de 12 — nous appeler</option>
+                    </Champ>
+                  </div>
+                </fieldset>
+
+                {/* ---------- 2. Où ? ---------- */}
+                <fieldset>
+                  <legend className="surtitre text-ocre">2 — Où ?</legend>
+
+                  <p className="mt-3 text-sm leading-relaxed text-nuit/60">
+                    Choisissez votre table sur le plan, ou laissez-nous vous placer au mieux.
+                  </p>
+
+                  <ZoneDeChoix
+                    date={valeurs.date}
+                    grandeTablee={grandeTablee}
+                    chargement={chargementPlan}
+                    zoneActive={zoneActive}
+                    surChangementZone={setZoneActive}
+                    occupees={occupees}
+                    couverts={nombreCouverts}
+                    selection={valeurs.table}
+                    surSelection={(id) =>
+                      setValeurs((v) => ({ ...v, table: v.table === id ? '' : id }))
+                    }
                   />
-                  <Champ
-                    label="Téléphone"
-                    name="telephone"
-                    type="tel"
-                    value={valeurs.telephone}
-                    onChange={majChamp}
-                    required
-                    autoComplete="tel"
-                    inputMode="tel"
-                  />
-                </div>
+                </fieldset>
 
-                <Champ
-                  label="E-mail"
-                  name="email"
-                  type="email"
-                  value={valeurs.email}
-                  onChange={majChamp}
-                  required
-                  autoComplete="email"
-                  inputMode="email"
-                />
+                {/* ---------- 3. Vos coordonnées ---------- */}
+                <fieldset>
+                  <legend className="surtitre text-ocre">3 — Vos coordonnées</legend>
 
-                <div className="grid gap-5 sm:grid-cols-3">
-                  <Champ
-                    label="Date"
-                    name="date"
-                    type="date"
-                    value={valeurs.date}
-                    onChange={majChamp}
-                    required
-                    min={aujourdhui}
-                  />
+                  <div className="mt-6 space-y-5">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <Champ
+                        label="Nom"
+                        name="nom"
+                        value={valeurs.nom}
+                        onChange={majChamp}
+                        required
+                        autoComplete="name"
+                      />
+                      <Champ
+                        label="Téléphone"
+                        name="telephone"
+                        type="tel"
+                        value={valeurs.telephone}
+                        onChange={majChamp}
+                        required
+                        autoComplete="tel"
+                        inputMode="tel"
+                      />
+                    </div>
 
-                  <Champ label="Service" name="service" as="select" value={valeurs.service} onChange={majChamp}>
-                    {creneaux.map((c) => (
-                      <option key={c.valeur} value={c.valeur}>
-                        {c.libelle}
-                      </option>
-                    ))}
-                  </Champ>
+                    <Champ
+                      label="E-mail"
+                      name="email"
+                      type="email"
+                      value={valeurs.email}
+                      onChange={majChamp}
+                      required
+                      autoComplete="email"
+                      inputMode="email"
+                    />
 
-                  <Champ
-                    label="Couverts"
-                    name="couverts"
-                    as="select"
-                    value={valeurs.couverts}
-                    onChange={majChamp}
-                  >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
-                      <option key={n} value={String(n)}>
-                        {n} {n > 1 ? 'personnes' : 'personne'}
-                      </option>
-                    ))}
-                    <option value="13+">Plus de 12 — nous appeler</option>
-                  </Champ>
-                </div>
-
-                <Champ
-                  label="Allergies, occasion particulière, demande…"
-                  name="message"
-                  as="textarea"
-                  value={valeurs.message}
-                  onChange={majChamp}
-                  optionnel
-                />
+                    <Champ
+                      label="Allergies, occasion particulière, demande…"
+                      name="message"
+                      as="textarea"
+                      value={valeurs.message}
+                      onChange={majChamp}
+                      optionnel
+                    />
+                  </div>
+                </fieldset>
 
                 {etat === 'erreur' && (
                   <p role="alert" className="text-sm text-ocre">
@@ -209,6 +301,139 @@ export function Reservation() {
         <CarteLocalisation />
       </div>
     </section>
+  )
+}
+
+/**
+ * Étape « Où ? » : bascule entre les deux espaces et plan cliquable.
+ * Le choix reste facultatif — imposer une table ferait perdre des réservations
+ * à ceux qui s'en moquent, et prive la maison de sa marge de manœuvre en salle.
+ */
+function ZoneDeChoix({
+  date,
+  grandeTablee,
+  chargement,
+  zoneActive,
+  surChangementZone,
+  occupees,
+  couverts,
+  selection,
+  surSelection,
+}) {
+  if (grandeTablee) {
+    return (
+      <Encart>
+        Au-delà de douze couverts, nous organisons la salle sur mesure : appelez-nous au{' '}
+        {infos.telephoneAffiche}, nous verrons ensemble la meilleure disposition.
+      </Encart>
+    )
+  }
+
+  if (!date) {
+    return (
+      <Encart>
+        Indiquez d’abord une date et un service : le plan affichera les tables encore libres.
+      </Encart>
+    )
+  }
+
+  const zone = zones.find((z) => z.id === zoneActive) ?? zones[0]
+  const choisie = selection ? trouverTable(selection) : null
+
+  const libresIci = zone.tables.filter(
+    (table) => !occupees.has(table.id) && table.couverts >= couverts,
+  ).length
+
+  const autreZone = zones.find((z) => z.id !== zone.id)
+  const libresAilleurs = autreZone
+    ? autreZone.tables.filter((table) => !occupees.has(table.id) && table.couverts >= couverts)
+        .length
+    : 0
+
+  return (
+    <div className="mt-6">
+      {/* Bascule salle / terrasse */}
+      <div className="flex gap-2" role="tablist" aria-label="Espaces du restaurant">
+        {zones.map((z) => {
+          const actif = z.id === zone.id
+          return (
+            <button
+              key={z.id}
+              type="button"
+              role="tab"
+              aria-selected={actif}
+              onClick={() => surChangementZone(z.id)}
+              className={`flex-1 border px-4 py-3 font-display text-lg transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] sm:text-xl ${
+                actif
+                  ? 'border-ocre bg-ocre text-creme'
+                  : 'border-sable text-nuit/60 hover:border-ocre/50 hover:text-nuit'
+              }`}
+            >
+              {z.nom}
+            </button>
+          )
+        })}
+      </div>
+
+      <p className="mt-4 text-sm leading-relaxed text-nuit/60">{zone.description}</p>
+
+      <div className="mt-6 border border-sable bg-creme-fonce/40 p-4 sm:p-6">
+        {chargement ? (
+          <p className="py-20 text-center text-sm text-nuit/50">Recherche des tables libres…</p>
+        ) : (
+          <PlanSalle
+            zone={zone}
+            occupees={occupees}
+            couverts={couverts}
+            selection={selection}
+            onSelectionner={surSelection}
+          />
+        )}
+      </div>
+
+      {/* Impasse : on le dit franchement et on propose une porte de sortie,
+          plutôt que de laisser le visiteur devant un plan entièrement barré. */}
+      {!chargement && libresIci === 0 && (
+        <p className="mt-5 border-l-2 border-ocre bg-creme-fonce/50 px-5 py-4 text-sm leading-relaxed text-nuit/70">
+          Aucune table de {couverts} couverts n’est libre à ce service dans cet espace.{' '}
+          {libresAilleurs > 0
+            ? `Il reste de la place ${autreZone.id === 'terrasse' ? 'en terrasse' : 'en salle'} — ou essayez un autre jour.`
+            : 'Essayez un autre jour ou un autre service, et appelez-nous : il reste souvent une solution.'}
+        </p>
+      )}
+
+      {/* Récapitulatif du choix */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-sable pt-5">
+        {choisie ? (
+          <p className="text-sm text-nuit/75">
+            Table <span className="font-medium text-nuit">{choisie.id}</span> — {choisie.zoneNom},{' '}
+            {choisie.couverts} couverts.
+          </p>
+        ) : (
+          <p className="text-sm text-nuit/55">
+            Aucune table choisie : nous vous placerons au mieux.
+          </p>
+        )}
+
+        {choisie && (
+          <button
+            type="button"
+            onClick={() => surSelection(choisie.id)}
+            className="surtitre text-ocre underline underline-offset-4"
+          >
+            Sans préférence
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Encart({ children }) {
+  return (
+    <p className="mt-6 border border-dashed border-sable bg-creme-fonce/40 px-6 py-10 text-center text-sm leading-relaxed text-nuit/55">
+      {children}
+    </p>
   )
 }
 
@@ -369,7 +594,7 @@ function Champ({ label, name, as = 'input', optionnel = false, children, ...prop
           className={`${styleCommun} appearance-none bg-no-repeat pr-10`}
           style={{
             backgroundImage:
-              "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%23b5793f' stroke-width='1.5'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E\")",
+              "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%23a85736' stroke-width='1.5'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E\")",
             backgroundPosition: 'right 1rem center',
           }}
           {...props}
@@ -386,6 +611,8 @@ function Champ({ label, name, as = 'input', optionnel = false, children, ...prop
 /** Construit le lien mailto de repli quand aucun endpoint n'est configuré. */
 function lienMailto(v) {
   const service = creneaux.find((c) => c.valeur === v.service)?.libelle ?? v.service
+  const table = v.table ? trouverTable(v.table) : null
+
   const corps = [
     `Nom : ${v.nom}`,
     `Téléphone : ${v.telephone}`,
@@ -393,6 +620,7 @@ function lienMailto(v) {
     `Date : ${v.date}`,
     `Service : ${service}`,
     `Couverts : ${v.couverts}`,
+    `Place : ${table ? `table ${table.id} — ${table.zoneNom}` : 'sans préférence'}`,
     '',
     v.message || '(aucune précision)',
   ].join('\n')

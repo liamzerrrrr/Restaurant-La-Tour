@@ -152,6 +152,29 @@ décélération douce, jamais de rebond.
 
 ---
 
+## Le choix de la table
+
+La réservation se fait en trois temps : **quand**, **où**, **qui**. L'étape
+« où » affiche un plan cliquable de l'espace choisi — la salle ou la terrasse —
+sur lequel on prend sa table comme un fauteuil au cinéma.
+
+| Fichier | Rôle |
+|---|---|
+| `src/data/salle.js` | **Le plan — fictif.** Chaque zone a sa propre grille de coordonnées : on peut relever les cotes réelles et les reporter telles quelles. |
+| `src/data/disponibilites.js` | **Les tables occupées — simulées.** Fonction déterministe : même date, même résultat. |
+| `src/components/PlanSalle.jsx` | Le rendu SVG et l'interaction. Ne connaît ni le plan ni les disponibilités : il reçoit tout. |
+
+Le choix reste **facultatif** : imposer une table ferait perdre les réservations
+de ceux que ça n'intéresse pas, et prive la maison de sa marge de manœuvre en
+salle. Une table choisie se libère automatiquement si elle cesse d'être valable
+— changement de date, de service, ou de nombre de couverts.
+
+> ⚠️ **Le choix de table n'a de sens qu'avec un serveur.** Aujourd'hui la
+> disponibilité est inventée : sans planning partagé, deux clients peuvent
+> réserver la même table à la même heure. La marche à suivre pour brancher un
+> vrai planning est commentée en tête de `src/data/disponibilites.js` — la
+> fonction est déjà asynchrone, l'interface n'a pas à changer.
+
 ## Le formulaire de réservation
 
 Il fonctionne **sans serveur** : sans configuration, il ouvre le logiciel de

@@ -67,6 +67,13 @@
     letter-spacing: -0.01em;
   }
 
+  /* Les navigateurs donnent aux fieldset un `min-width: min-content` qui n'est
+     pas réinitialisé par défaut : un contenu large (ici le plan de salle)
+     empêche alors le bloc de rétrécir et fait déborder toute la page. */
+  fieldset {
+    min-inline-size: 0;
+  }
+
   /* Focus visible et élégant, indispensable à l'accessibilité clavier */
   :focus-visible {
     outline: 2px solid var(--color-ocre);
