@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { TitreSection } from './TitreSection'
-import { PlanSalle } from './PlanSalle'
 import { useReveal } from '../hooks/useReveal'
 import { indexJourCourant, infos } from '../data/infos'
-import { trouverTable, zones } from '../data/salle'
-import { tablesOccupees } from '../data/disponibilites'
 import {
   IconeEpingle,
   IconeFleche,
@@ -23,8 +20,8 @@ const ENDPOINT = import.meta.env.VITE_RESERVATION_ENDPOINT
 
 // Libellés courts : ils doivent rester lisibles dans un select étroit sur mobile
 const creneaux = [
-  { valeur: 'midi', libelle: 'Déjeuner · 12h00' },
-  { valeur: 'soir', libelle: 'Dîner · 19h15' },
+  { valeur: 'midi', libelle: 'Déjeuner · 12h00–13h00' },
+  { valeur: 'soir', libelle: 'Dîner · 19h00–21h00' },
 ]
 
 const champVide = {
@@ -34,61 +31,25 @@ const champVide = {
   date: '',
   service: 'soir',
   couverts: '2',
-  table: '',
+  preference: 'interieur',
   message: '',
 }
 
 export function Reservation() {
   const [valeurs, setValeurs] = useState(champVide)
   const [etat, setEtat] = useState('repos') // repos | envoi | succes | erreur
-  const [occupees, setOccupees] = useState(() => new Set())
-  const [chargementPlan, setChargementPlan] = useState(false)
-  const [zoneActive, setZoneActive] = useState(zones[0].id)
   const formulaire = useReveal()
 
   const majChamp = (e) => setValeurs((v) => ({ ...v, [e.target.name]: e.target.value }))
 
-  // « 13+ » n'est pas un nombre : au-delà de douze couverts, on renvoie au
-  // téléphone plutôt que de laisser choisir une table qui ne suffira pas.
-  const nombreCouverts = Number(valeurs.couverts)
-  const grandeTablee = !Number.isFinite(nombreCouverts)
-
-  // Disponibilités du jour et du service choisis
-  useEffect(() => {
-    if (!valeurs.date) {
-      setOccupees(new Set())
-      return undefined
-    }
-
-    let annule = false
-    setChargementPlan(true)
-
-    tablesOccupees(valeurs.date, valeurs.service).then((resultat) => {
-      if (annule) return
-      setOccupees(resultat)
-      setChargementPlan(false)
-    })
-
-    return () => {
-      annule = true
-    }
-  }, [valeurs.date, valeurs.service])
-
-  // Une table choisie peut cesser d'être valable si l'on change de date, de
-  // service ou de nombre de couverts : on la libère plutôt que de laisser
-  // partir une demande incohérente.
-  useEffect(() => {
-    if (!valeurs.table) return
-
-    const table = trouverTable(valeurs.table)
-    const invalide =
-      !table || occupees.has(valeurs.table) || grandeTablee || table.couverts < nombreCouverts
-
-    if (invalide) setValeurs((v) => ({ ...v, table: '' }))
-  }, [occupees, nombreCouverts, grandeTablee, valeurs.table])
+  const jourSelectionne = valeurs.date ? (new Date(valeurs.date+'T12:00:00Z').getUTCDay()+6)%7 : null
+  const ligne = jourSelectionne===null?null:infos.horaires[jourSelectionne]
+  const servicesOuverts = creneaux.filter(c=>!ligne || ligne[c.valeur])
+  useEffect(()=>{if(ligne&&!ligne[valeurs.service])setValeurs(v=>({...v,service:servicesOuverts[0]?.valeur||''}))},[valeurs.date])
 
   const envoyer = async (e) => {
     e.preventDefault()
+    if(!valeurs.date||!ligne?.[valeurs.service]){setEtat('erreur');return}
     setEtat('envoi')
 
     if (!ENDPOINT) {
@@ -180,7 +141,7 @@ export function Reservation() {
                       value={valeurs.service}
                       onChange={majChamp}
                     >
-                      {creneaux.map((c) => (
+                      {servicesOuverts.map((c) => (
                         <option key={c.valeur} value={c.valeur}>
                           {c.libelle}
                         </option>
@@ -201,30 +162,15 @@ export function Reservation() {
                       ))}
                       <option value="13+">Plus de 12 — nous appeler</option>
                     </Champ>
-                  </div>
+                  </div>{valeurs.date && !servicesOuverts.length && <p>Le restaurant est fermé le mercredi. Choisissez une autre date.</p>}
                 </fieldset>
 
                 {/* ---------- 2. Où ? ---------- */}
                 <fieldset>
                   <legend className="surtitre text-ocre">2 — Où ?</legend>
 
-                  <p className="mt-3 text-sm leading-relaxed text-nuit/60">
-                    Choisissez votre table sur le plan, ou laissez-nous vous placer au mieux.
-                  </p>
-
-                  <ZoneDeChoix
-                    date={valeurs.date}
-                    grandeTablee={grandeTablee}
-                    chargement={chargementPlan}
-                    zoneActive={zoneActive}
-                    surChangementZone={setZoneActive}
-                    occupees={occupees}
-                    couverts={nombreCouverts}
-                    selection={valeurs.table}
-                    surSelection={(id) =>
-                      setValeurs((v) => ({ ...v, table: v.table === id ? '' : id }))
-                    }
-                  />
+                  <p className="mt-3 text-sm leading-relaxed text-nuit/60">Indiquez votre préférence intérieur ou terrasse. Le placement est organisé par les gérants, sans choix de table.</p>
+                  <Champ label="Préférence de placement" name="preference" as="select" value={valeurs.preference} onChange={majChamp}><option value="interieur">Intérieur</option><option value="terrasse">Terrasse</option></Champ>
                 </fieldset>
 
                 {/* ---------- 3. Vos coordonnées ---------- */}
@@ -281,7 +227,7 @@ export function Reservation() {
                   </p>
                 )}
 
-                <button type="submit" disabled={etat === 'envoi'} className="btn-principal w-full disabled:opacity-60">
+                <button type="submit" disabled={etat === 'envoi' || !valeurs.date || !ligne?.[valeurs.service]} className="btn-principal w-full disabled:opacity-60">
                   {etat === 'envoi' ? 'Envoi en cours…' : 'Envoyer la demande'}
                   {etat !== 'envoi' && <IconeFleche />}
                 </button>
@@ -301,139 +247,6 @@ export function Reservation() {
         <CarteLocalisation />
       </div>
     </section>
-  )
-}
-
-/**
- * Étape « Où ? » : bascule entre les deux espaces et plan cliquable.
- * Le choix reste facultatif — imposer une table ferait perdre des réservations
- * à ceux qui s'en moquent, et prive la maison de sa marge de manœuvre en salle.
- */
-function ZoneDeChoix({
-  date,
-  grandeTablee,
-  chargement,
-  zoneActive,
-  surChangementZone,
-  occupees,
-  couverts,
-  selection,
-  surSelection,
-}) {
-  if (grandeTablee) {
-    return (
-      <Encart>
-        Au-delà de douze couverts, nous organisons la salle sur mesure : appelez-nous au{' '}
-        {infos.telephoneAffiche}, nous verrons ensemble la meilleure disposition.
-      </Encart>
-    )
-  }
-
-  if (!date) {
-    return (
-      <Encart>
-        Indiquez d’abord une date et un service : le plan affichera les tables encore libres.
-      </Encart>
-    )
-  }
-
-  const zone = zones.find((z) => z.id === zoneActive) ?? zones[0]
-  const choisie = selection ? trouverTable(selection) : null
-
-  const libresIci = zone.tables.filter(
-    (table) => !occupees.has(table.id) && table.couverts >= couverts,
-  ).length
-
-  const autreZone = zones.find((z) => z.id !== zone.id)
-  const libresAilleurs = autreZone
-    ? autreZone.tables.filter((table) => !occupees.has(table.id) && table.couverts >= couverts)
-        .length
-    : 0
-
-  return (
-    <div className="mt-6">
-      {/* Bascule salle / terrasse */}
-      <div className="flex gap-2" role="tablist" aria-label="Espaces du restaurant">
-        {zones.map((z) => {
-          const actif = z.id === zone.id
-          return (
-            <button
-              key={z.id}
-              type="button"
-              role="tab"
-              aria-selected={actif}
-              onClick={() => surChangementZone(z.id)}
-              className={`flex-1 border px-4 py-3 font-display text-lg transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] sm:text-xl ${
-                actif
-                  ? 'border-ocre bg-ocre text-creme'
-                  : 'border-sable text-nuit/60 hover:border-ocre/50 hover:text-nuit'
-              }`}
-            >
-              {z.nom}
-            </button>
-          )
-        })}
-      </div>
-
-      <p className="mt-4 text-sm leading-relaxed text-nuit/60">{zone.description}</p>
-
-      <div className="mt-6 border border-sable bg-creme-fonce/40 p-4 sm:p-6">
-        {chargement ? (
-          <p className="py-20 text-center text-sm text-nuit/50">Recherche des tables libres…</p>
-        ) : (
-          <PlanSalle
-            zone={zone}
-            occupees={occupees}
-            couverts={couverts}
-            selection={selection}
-            onSelectionner={surSelection}
-          />
-        )}
-      </div>
-
-      {/* Impasse : on le dit franchement et on propose une porte de sortie,
-          plutôt que de laisser le visiteur devant un plan entièrement barré. */}
-      {!chargement && libresIci === 0 && (
-        <p className="mt-5 border-l-2 border-ocre bg-creme-fonce/50 px-5 py-4 text-sm leading-relaxed text-nuit/70">
-          Aucune table de {couverts} couverts n’est libre à ce service dans cet espace.{' '}
-          {libresAilleurs > 0
-            ? `Il reste de la place ${autreZone.id === 'terrasse' ? 'en terrasse' : 'en salle'} — ou essayez un autre jour.`
-            : 'Essayez un autre jour ou un autre service, et appelez-nous : il reste souvent une solution.'}
-        </p>
-      )}
-
-      {/* Récapitulatif du choix */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-sable pt-5">
-        {choisie ? (
-          <p className="text-sm text-nuit/75">
-            Table <span className="font-medium text-nuit">{choisie.id}</span> — {choisie.zoneNom},{' '}
-            {choisie.couverts} couverts.
-          </p>
-        ) : (
-          <p className="text-sm text-nuit/55">
-            Aucune table choisie : nous vous placerons au mieux.
-          </p>
-        )}
-
-        {choisie && (
-          <button
-            type="button"
-            onClick={() => surSelection(choisie.id)}
-            className="surtitre text-ocre underline underline-offset-4"
-          >
-            Sans préférence
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function Encart({ children }) {
-  return (
-    <p className="mt-6 border border-dashed border-sable bg-creme-fonce/40 px-6 py-10 text-center text-sm leading-relaxed text-nuit/55">
-      {children}
-    </p>
   )
 }
 
@@ -611,7 +424,6 @@ function Champ({ label, name, as = 'input', optionnel = false, children, ...prop
 /** Construit le lien mailto de repli quand aucun endpoint n'est configuré. */
 function lienMailto(v) {
   const service = creneaux.find((c) => c.valeur === v.service)?.libelle ?? v.service
-  const table = v.table ? trouverTable(v.table) : null
 
   const corps = [
     `Nom : ${v.nom}`,
@@ -620,7 +432,7 @@ function lienMailto(v) {
     `Date : ${v.date}`,
     `Service : ${service}`,
     `Couverts : ${v.couverts}`,
-    `Place : ${table ? `table ${table.id} — ${table.zoneNom}` : 'sans préférence'}`,
+    `Préférence : ${v.preference==='terrasse'?'Terrasse':'Intérieur'} — placement organisé par les gérants`,
     '',
     v.message || '(aucune précision)',
   ].join('\n')

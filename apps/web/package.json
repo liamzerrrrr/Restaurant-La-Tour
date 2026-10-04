@@ -1,0 +1,29 @@
+{
+  "name": "la-tour-montady",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "node tests/browser.cjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource/cormorant-garamond": "5.3.0",
+    "next": "16.3.8",
+    "postgres": "3.4.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "playwright": "^1.63.0",
+    "typescript": "^5.9.0"
+  },
+  "type": "module"
+}

@@ -1,0 +1,19 @@
+-- PostgreSQL. No fictitious service or dining table is seeded into the real database.
+BEGIN;
+CREATE TABLE services(id uuid PRIMARY KEY, date date NOT NULL, name text NOT NULL CHECK(name IN ('lunch','dinner')), first_arrival timestamptz NOT NULL, last_arrival timestamptz NOT NULL, closes_at timestamptz NOT NULL, capacity int NOT NULL DEFAULT 100 CHECK(capacity>0), duration_minutes int NOT NULL CHECK(duration_minutes BETWEEN 30 AND 300), step_minutes int NOT NULL CHECK(step_minutes BETWEEN 5 AND 60), mode text NOT NULL DEFAULT 'immediate' CHECK(mode IN ('immediate','approval')), closed boolean NOT NULL DEFAULT false, terrace_closed boolean NOT NULL DEFAULT false, UNIQUE(date,name), CHECK(first_arrival<=last_arrival AND last_arrival<closes_at));
+CREATE TABLE reservations(id uuid PRIMARY KEY, service_id uuid REFERENCES services NOT NULL, starts_at timestamptz NOT NULL, ends_at timestamptz NOT NULL, people int NOT NULL CHECK(people BETWEEN 1 AND 30), preference text NOT NULL CHECK(preference IN ('interior','terrace')), zone text NOT NULL CHECK(zone IN ('interior','terrace')), status text NOT NULL CHECK(status IN ('pending','confirmed','arrived','completed','cancelled','no_show')), name text NOT NULL, phone text NOT NULL, email text NOT NULL, comment text NOT NULL DEFAULT '', allergies text NOT NULL DEFAULT '', source text NOT NULL CHECK(source IN ('site','phone','email','instagram','facebook')), revision int NOT NULL DEFAULT 1, token_hash text UNIQUE NOT NULL, token_expires_at timestamptz NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), CHECK(ends_at>starts_at));
+CREATE TABLE move_proposals(id uuid PRIMARY KEY, reservation_id uuid REFERENCES reservations NOT NULL, seats int NOT NULL CHECK(seats>0), starts_at timestamptz NOT NULL, ends_at timestamptz NOT NULL, expires_at timestamptz NOT NULL, status text NOT NULL CHECK(status IN ('pending','accepted','declined','expired')), CHECK(ends_at>starts_at));
+CREATE UNIQUE INDEX one_pending_move ON move_proposals(reservation_id) WHERE status='pending';
+CREATE TABLE audit_events(id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text NOT NULL, reservation_id uuid REFERENCES reservations, event text NOT NULL, details jsonb NOT NULL DEFAULT '{}');
+CREATE TABLE notification_jobs(id uuid PRIMARY KEY, reservation_id uuid REFERENCES reservations NOT NULL, revision int NOT NULL, kind text NOT NULL CHECK(kind IN ('confirmation','reminder','move','cancellation')), due_at timestamptz NOT NULL, state text NOT NULL DEFAULT 'queued' CHECK(state IN ('queued','processing','sent','failed','cancelled','unknown')), attempt int NOT NULL DEFAULT 0, provider_id text, last_error text, cost numeric(8,4), UNIQUE(reservation_id,revision,kind));
+CREATE TABLE auth_attempts(key text PRIMARY KEY, window_start timestamptz NOT NULL, attempts int NOT NULL);
+CREATE TABLE menu_items(id uuid PRIMARY KEY, category text NOT NULL, name text NOT NULL, description text NOT NULL, price numeric(8,2) CHECK(price>=0), available boolean NOT NULL DEFAULT true, source_url text NOT NULL, revision int NOT NULL DEFAULT 1, validated_revision int, validated_by text, validated_at timestamptz, published boolean NOT NULL DEFAULT false, CHECK(NOT published OR (validated_revision IS NOT NULL AND validated_revision=revision AND validated_by IS NOT NULL AND validated_at IS NOT NULL AND price IS NOT NULL)));
+CREATE FUNCTION invalidate_menu_validation() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF (NEW.name,NEW.description,NEW.price,NEW.category,NEW.available,NEW.source_url) IS DISTINCT FROM (OLD.name,OLD.description,OLD.price,OLD.category,OLD.available,OLD.source_url) THEN
+  NEW.revision:=OLD.revision+1;NEW.validated_revision:=NULL;NEW.validated_at:=NULL;NEW.validated_by:=NULL;NEW.published:=false;
+ END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER reset_validation BEFORE UPDATE ON menu_items FOR EACH ROW EXECUTE FUNCTION invalidate_menu_validation();
+COMMIT;

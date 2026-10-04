@@ -1,3 +1,5 @@
+> Mise à jour du 4 octobre 2026 : horaires fournis par le propriétaire (midi 12h–13h, soir 19h–21h ; mercredi fermé, mardi et dimanche soir fermés). Aucun plan de table client. Voir `apps/web/README.md` pour le prototype à 100 couverts par service et le champ allergies.
+
 # Restaurant La Tour — Montady
 
 Site vitrine one-page du Restaurant La Tour, à Montady (Hérault).
@@ -151,28 +153,11 @@ décélération douce, jamais de rebond.
 
 ---
 
-## Le choix de la table
+## Préférence de placement
 
-La réservation se fait en trois temps : **quand**, **où**, **qui**. L'étape
-« où » affiche un plan cliquable de l'espace choisi — la salle ou la terrasse —
-sur lequel on prend sa table comme un fauteuil au cinéma.
+Le client choisit uniquement intérieur ou terrasse. Aucun plan ni choix de table n’est affiché ; les gérants organisent la mise en place. Les jours et services fermés sont retirés du formulaire. Source commune des horaires : `src/data/horaires.json`.
 
-| Fichier | Rôle |
-|---|---|
-| `src/data/salle.js` | **Le plan — fictif.** Chaque zone a sa propre grille de coordonnées : on peut relever les cotes réelles et les reporter telles quelles. |
-| `src/data/disponibilites.js` | **Les tables occupées — simulées.** Fonction déterministe : même date, même résultat. |
-| `src/components/PlanSalle.jsx` | Le rendu SVG et l'interaction. Ne connaît ni le plan ni les disponibilités : il reçoit tout. |
-
-Le choix reste **facultatif** : imposer une table ferait perdre les réservations
-de ceux que ça n'intéresse pas, et prive la maison de sa marge de manœuvre en
-salle. Une table choisie se libère automatiquement si elle cesse d'être valable
-— changement de date, de service, ou de nombre de couverts.
-
-> ⚠️ **Le choix de table n'a de sens qu'avec un serveur.** Aujourd'hui la
-> disponibilité est inventée : sans planning partagé, deux clients peuvent
-> réserver la même table à la même heure. La marche à suivre pour brancher un
-> vrai planning est commentée en tête de `src/data/disponibilites.js` — la
-> fonction est déjà asynchrone, l'interface n'a pas à changer.
+La nouvelle application de démonstration est isolée dans `apps/web`. Son quota provisoire est de 100 couverts par service, partagé entre intérieur et terrasse. La version Vite reste un formulaire de demande et ne prétend pas calculer un inventaire réel.
 
 ## Le formulaire de réservation
 

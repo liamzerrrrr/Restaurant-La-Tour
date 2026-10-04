@@ -1,0 +1,63 @@
+[
+  {
+    "id": "creiva",
+    "nom": "Créiva",
+    "categorie": "Communication · Print · Évènement · Décoration",
+    "ville": "Béziers",
+    "description": "Créiva propose ses services pour la réalisation de votre communication marketing, identité visuelle, impression, décoration et l’organisation d’évènements dans l’Hérault, pour les particuliers comme pour les professionnels.",
+    "site": {
+      "url": "https://www.creiva.fr/",
+      "libelle": "Découvrir Créiva"
+    },
+    "logo": null
+  },
+  {
+    "id": "gouty",
+    "nom": "Brigitte & JC Gouty",
+    "categorie": "Chambres d’hôtes",
+    "ville": "Puisserguier",
+    "description": "Brigitte et Jean-Claude vous accueillent au cœur des vignobles, dans un endroit paisible. Leur villa abrite une suite parentale avec entrée et véranda indépendantes, salle de douche à l’italienne et WC privés — au calme et au vert, à l’écart du village, à quinze minutes à pied du centre de Puisserguier.",
+    "telephone": "+33661190259",
+    "telephoneAffiche": "06 61 19 02 59",
+    "logo": null
+  },
+  {
+    "id": "herault-vin-selection",
+    "nom": "Hérault Vin Sélection",
+    "categorie": "Une table, un vin",
+    "description": "Grand Terroir, domaines et châteaux : un terroir, des hommes de talent. Dégustation sur rendez-vous.",
+    "telephone": "+33617549499",
+    "telephoneAffiche": "06 17 54 94 99",
+    "libelleTelephone": "Dégustation au",
+    "logo": null
+  },
+  {
+    "id": "cellar-concept",
+    "nom": "Cellar Concept",
+    "categorie": "Cave à vins",
+    "ville": "Montady",
+    "description": "La cave à vins de Montady, à deux pas du restaurant.",
+    "adresse": "15 rue du Pin, 34310 Montady",
+    "telephone": "+33411270427",
+    "telephoneAffiche": "04 11 27 04 27",
+    "logo": null
+  },
+  {
+    "id": "sandra-estelles",
+    "nom": "Sandra Estelles",
+    "categorie": "Photographe",
+    "ville": "Béziers",
+    "description": "Photographe à Béziers, elle accompagne les grands moments :",
+    "prestations": [
+      "Mariage",
+      "Grossesse",
+      "Nouveau-né",
+      "Famille"
+    ],
+    "site": {
+      "url": "https://www.sandraestelles.com/",
+      "libelle": "Découvrir Sandra Estelles"
+    },
+    "logo": null
+  }
+]

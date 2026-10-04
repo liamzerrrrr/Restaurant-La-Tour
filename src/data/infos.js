@@ -1,3 +1,4 @@
+import horaires from './horaires.json'
 /**
  * Informations pratiques du restaurant.
  * Ces données alimentent le pied de page, la section contact et les liens
@@ -38,18 +39,9 @@ export const infos = {
    * Horaires de service (prise de commande).
    * `midi` / `soir` à null = fermé sur ce service.
    */
-  horaires: [
-    { jour: 'Lundi', midi: '12h00 – 13h15', soir: '19h15 – 20h30' },
-    { jour: 'Mardi', midi: '12h00 – 13h15', soir: null },
-    { jour: 'Mercredi', midi: null, soir: null },
-    { jour: 'Jeudi', midi: '12h00 – 13h15', soir: '19h15 – 20h30' },
-    { jour: 'Vendredi', midi: '12h00 – 13h15', soir: '19h15 – 20h30' },
-    { jour: 'Samedi', midi: '12h00 – 13h15', soir: '19h15 – 20h30' },
-    { jour: 'Dimanche', midi: '12h00 – 13h15', soir: null },
-  ],
+  horaires: horaires.map(h=>({jour:h.jour,midi:h.midi?h.midi.join(' – '):null,soir:h.soir?h.soir.join(' – '):null})),
+  noteHoraires: 'Fermé le mercredi, le mardi soir et le dimanche soir.',
 
-  noteHoraires:
-    "Horaires de prise de commande. Le service se prolonge en salle et en terrasse jusqu'à 20h45 en saison estivale.",
 }
 
 /** Index du jour courant dans le tableau `horaires` (lundi = 0). */
