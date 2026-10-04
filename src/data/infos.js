@@ -1,4 +1,4 @@
-import horaires from './horaires.json'
+import horaires from '../../apps/web/lib/horaires.json'
 /**
  * Informations pratiques du restaurant.
  * Ces données alimentent le pied de page, la section contact et les liens

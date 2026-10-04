@@ -5,7 +5,13 @@ import {db} from './db';
 const cookie='montady-admin';
 export function configured(){return Boolean(process.env.DATABASE_URL&&process.env.ADMIN_EMAIL&&process.env.ADMIN_PASSWORD_HASH&&(process.env.AUTH_SECRET?.length??0)>=32&&process.env.APP_MODE==='connected');}
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
-export function allowedOrigin(request:Request){const origins=[process.env.APP_ORIGIN,...(process.env.ADMIN_ALLOWED_ORIGINS||'').split(',')].filter(Boolean);return origins.includes(request.headers.get('origin')||'');}
+export function allowedOrigin(request:Request){
+ // These hostnames are supplied by Vercel, never by incoming request headers.
+ const previewOrigins=process.env.VERCEL==='1'&&process.env.VERCEL_ENV==='preview'
+  ?[process.env.VERCEL_URL,process.env.VERCEL_BRANCH_URL].filter(Boolean).map(host=>`https://${host}`):[];
+ const origins=[process.env.APP_ORIGIN,...(process.env.ADMIN_ALLOWED_ORIGINS||'').split(','),...previewOrigins].filter(Boolean);
+ return origins.includes(request.headers.get('origin')||'');
+}
 export async function authenticated(){
  if(!configured())return false;const token=(await cookies()).get(cookie)?.value;
  if(!token||!/^[A-Za-z0-9_-]{43}$/.test(token))return false;

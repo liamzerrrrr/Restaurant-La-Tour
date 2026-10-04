@@ -4,7 +4,7 @@
 
 Le formulaire public enregistre désormais les essais dans la base Neon commune `montady-test` (Francfort). L'accès `/gerant` est privé et utilise cette même base, avec ajout manuel, sources, édition, déplacement, six statuts, filtres jour/service/préférence, quota restant, fermeture/réouverture de service et journal. Les menus et la gestion de pluie restent séparés en démonstration, sans publication ni SMS réels.
 
-100 couverts par service, sans renouvellement automatique pendant le repas. La durée de 120 minutes est provisoire. La préférence intérieur/terrasse ne garantit pas le placement et aucun plan de table n'est proposé. Les créneaux suivent `src/data/horaires.json` ; mercredi fermé, mardi/dimanche midi uniquement. Horizon en ligne : 90 jours. Le service est généré au premier accès ; les congés se gèrent par fermeture de chaque service.
+100 couverts par service, sans renouvellement automatique pendant le repas. La durée de 120 minutes est provisoire. La préférence intérieur/terrasse ne garantit pas le placement et aucun plan de table n'est proposé. Les créneaux suivent `apps/web/lib/horaires.json` ; mercredi fermé, mardi/dimanche midi uniquement. Horizon en ligne : 90 jours. Le service est généré au premier accès ; les congés se gèrent par fermeture de chaque service.
 
 ## Réservation et gestion
 
@@ -29,3 +29,11 @@ L'ancien test `test:connected` correspond à l'étape où les réservations éta
 ## Suite avant mise en service
 
 Gestion persistante de la pluie et des propositions, validation/publication des menus en base, paramétrage détaillé du gérant, prestataire et programmation des SMS, règles métier finales (capacité, durées, congés), protection contre les demandes abusives, mentions légales et politique de conservation. Aucun envoi SMS réel sans activation explicite.
+
+
+## Aperçu Vercel de test
+
+L’application Next.js est déployée depuis apps/web avec vercel.json. Les variables Neon et d’authentification sont limitées à l’environnement Preview ; SMS_ENABLED reste false. L’origine exacte du déploiement est autorisée depuis les variables système Vercel, jamais depuis l’en-tête Host du client. Le site Vite de production reste séparé.
+
+Aperçu : https://restaurant-la-tour-fwjf6xe1b-tomybarbierpro-4352s-projects.vercel.app
+
