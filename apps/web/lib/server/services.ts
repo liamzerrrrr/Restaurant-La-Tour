@@ -1,0 +1,13 @@
+import 'server-only';
+import {randomUUID} from 'node:crypto';
+import {db,assertConnected} from './db';
+import {slots,hours} from '../hours';
+export function parisInstant(date:string,time:string){const guess=new Date(date+'T'+time+':00Z');const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(guess);const get=(key:string)=>Number(parts.find(p=>p.type===key)!.value);const rendered=Date.UTC(get('year'),get('month')-1,get('day'),get('hour'),get('minute'),get('second'));return new Date(guess.getTime()-(rendered-guess.getTime()));}
+export function today(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+export async function ensureServices(date:string){assertConnected();const day=new Date(date+'T12:00:00Z');if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(day.getTime())||day.toISOString().slice(0,10)!==date||date<today()||day.getTime()>Date.now()+90*86400000)throw Error('INVALID_DATE');const h=hours.find(h=>h.day===day.getUTCDay());for(const [name,range] of [['lunch',h?.midi],['dinner',h?.soir]] as const){if(!range)continue;const first=parisInstant(date,range[0]),last=parisInstant(date,range[1]);await db()`INSERT INTO services(id,date,name,first_arrival,last_arrival,closes_at,capacity,duration_minutes,step_minutes) VALUES(${randomUUID()},${date},${name},${first},${last},${new Date(last.getTime()+120*60000)},100,120,30) ON CONFLICT(date,name) DO NOTHING`;}}
+export async function availability(date:string,people:number,preference:string){await ensureServices(date);const services=await db()`SELECT s.*,coalesce(sum(r.people) FILTER(WHERE r.status NOT IN ('cancelled','no_show')),0)::int AS used FROM services s LEFT JOIN reservations r ON r.service_id=s.id WHERE s.date=${date} GROUP BY s.id ORDER BY first_arrival`;
+ const choices=slots(date).map(time=>{const s=services.find(s=>s.name===(time<'16:00'?'lunch':'dinner'));const startsAt=parisInstant(date,time).toISOString();return {time,serviceId:s?.id,startsAt,remaining:s?Math.max(0,s.capacity-s.used):0,available:!!s&&!s.closed&&!(preference==='terrace'&&s.terrace_closed)&&s.capacity-s.used>=people&&new Date(startsAt)>new Date()};});
+ const closed=await db()`SELECT date::text,name FROM services WHERE closed=true AND date>=current_date`;
+ const dates=[...new Set(closed.map(s=>s.date))].filter(d=>{const h=hours.find(h=>h.day===new Date(d+'T12:00:00Z').getUTCDay());return (!h?.midi||closed.some(s=>s.date===d&&s.name==='lunch'))&&(!h?.soir||closed.some(s=>s.date===d&&s.name==='dinner'));});
+ return {choices,closedDates:dates};
+}

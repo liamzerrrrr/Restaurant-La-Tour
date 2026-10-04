@@ -5,7 +5,7 @@ import {slots} from '../lib/hours';
 const format = (date: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('fr-FR', {timeZone: 'UTC', ...options}).format(new Date(date + 'T12:00:00Z'));
 const iso = (year: number, month: number, day: number) => `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-export default function ReservationCalendar({value, min, closures, onChange}: {value: string; min: string; closures: string[]; onChange: (date: string) => void}) {
+export default function ReservationCalendar({value, min, closures,closedDates=[], onChange}: {value: string; min: string; closures: string[];closedDates?:string[]; onChange: (date: string) => void}) {
  const id = useId();
  const trigger = useRef<HTMLButtonElement>(null);
  const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function ReservationCalendar({value, min, closures, onChange}: {v
    <div className="date-navigation"><button type="button" aria-label="Mois précédent" disabled={!!min && month.slice(0, 7) <= min.slice(0, 7)} onClick={() => shift(-1)}>‹</button><strong aria-live="polite">{format(month, {month: 'long', year: 'numeric'})}</strong><button type="button" aria-label="Mois suivant" onClick={() => shift(1)}>›</button></div>
    <div className="date-grid">{['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'].map(day => <span key={day} className="date-weekday">{day}</span>)}{Array.from({length: offset}, (_, i) => <span key={'empty-' + i}/>)}{Array.from({length: count}, (_, i) => {
     const date = iso(year, index - 1, i + 1);
-    const closed = !slots(date).length || ['Midi', 'Soir'].every(service => ['Intérieur', 'Terrasse'].every(zone => closures.includes(date + '|' + service + '|' + zone)));
+    const closed = closedDates.includes(date)||!slots(date).length || ['Midi', 'Soir'].every(service => ['Intérieur', 'Terrasse'].every(zone => closures.includes(date + '|' + service + '|' + zone)));
     const past = !!min && date < min;
     return <button key={date} type="button" disabled={closed || past} className={[closed ? 'date-closed' : '', value === date ? 'date-selected' : ''].join(' ')} aria-label={format(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}) + (closed ? ' — restaurant fermé' : past ? ' — date passée' : '')} aria-pressed={value === date} title={closed ? 'Restaurant fermé' : undefined} onClick={() => {onChange(date); close();}}>{i + 1}</button>;
    })}</div>

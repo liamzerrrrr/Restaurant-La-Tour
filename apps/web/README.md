@@ -1,41 +1,31 @@
-# La Tour de Montady — prototype et application préparée
+# La Tour de Montady — essais connectés
 
-Mise à jour du 4 octobre 2026 : horaires fournis par le propriétaire, capacité provisoire de **100 couverts par service**, intérieur et terrasse réunis. Aucun plan ni choix de table ; les gérants organisent la mise en place. Les préférences ne garantissent pas un placement.
+## État livré le 4 octobre 2026
 
-## Horaires partagés
+Le formulaire public enregistre désormais les essais dans la base Neon commune `montady-test` (Francfort). L'accès `/gerant` est privé et utilise cette même base, avec ajout manuel, sources, édition, déplacement, six statuts, filtres jour/service/préférence, quota restant, fermeture/réouverture de service et journal. Les menus et la gestion de pluie restent séparés en démonstration, sans publication ni SMS réels.
 
-La source commune est `src/data/horaires.json`, utilisée par le site Vite et l’application Next.js. Midi : 12h–13h tous les jours sauf mercredi. Soir : 19h–21h lundi, jeudi, vendredi et samedi. Fermé mercredi, mardi soir et dimanche soir. Les créneaux sont proposés toutes les 30 minutes, jusqu’à 13h et 21h. Les jours fermés n’offrent aucun créneau ; les horaires passés sont refusés dans le prototype.
+100 couverts par service, sans renouvellement automatique pendant le repas. La durée de 120 minutes est provisoire. La préférence intérieur/terrasse ne garantit pas le placement et aucun plan de table n'est proposé. Les créneaux suivent `src/data/horaires.json` ; mercredi fermé, mardi/dimanche midi uniquement. Horizon en ligne : 90 jours. Le service est généré au premier accès ; les congés se gèrent par fermeture de chaque service.
 
-## Explorer
+## Réservation et gestion
 
-Dans `apps/web` : `npm ci`, `npm run build`, `npm start` (Node 24).
-- `/` : restaurant, carte, réservation simulée et contact.
-- `/demo/gerant` : réservations locales, allergies et besoins alimentaires, capacité et services, validation des menus, pluie, journal.
-- `/gerant` : connexion privée et consultation de la base de test commune.
-- `/partenaires` : partenaires du site existant.
+Les insertions et modifications verrouillent les services avant le contrôle du quota. Les modifications concurrentes utilisent aussi une révision, et un changement refusé conserve la réservation initiale. La déduplication par clé de demande évite les doubles créations lors d'une nouvelle tentative. Les réservations en attente et terminées comptent dans le quota ; annulation et absence libèrent les couverts.
 
-Les données de démonstration sont locales à l’appareil. Les anciennes réservations de test sont conservées ; aucune nouvelle attribution de table n’est créée. Les créneaux utilisent un quota commun par service, sans renouvellement automatique de capacité pendant le service. Les annulations libèrent des couverts ; les demandes en attente comptent dans le quota. La mise en place reste à la main du gérant.
+Après création, un lien privé permet de consulter l'essai, choisir un autre créneau ou annuler. Le jeton est dans le fragment de l'URL, envoyé en POST, stocké haché et expire après le repas. La réponse de consultation ne contient ni nom ni coordonnées. Les confirmations et rappels sont inscrits dans une file, actualisés après modification/annulation ; aucune distribution SMS n'est connectée.
 
-Le champ facultatif « Allergies et besoins alimentaires » conserve les indications dans la réservation et les affiche au gérant. Le formulaire ne promet aucune adaptation automatique ; l’équipe doit la confirmer.
+L'authentification utilise scrypt, sessions aléatoires hachées de 8 heures, cookies HttpOnly/SameSite Strict, Secure sur HTTPS, contrôle d'origine, limitation des tentatives et révocation à la déconnexion. Toutes les actions gérant vérifient la session côté serveur. Une panne de base ne déclenche jamais de repli sur des disponibilités inventées.
 
-## Pluie
+## Lancer et configurer
 
-Le gérant doit renseigner les places intérieures libres pour la date et le service choisis. Elles ne sont jamais déduites d’une répartition intérieur/terrasse inventée. Les propositions réservent temporairement ces places ; l’acceptation conserve le nombre total de couverts. Une proposition expirée ne vaut pas acceptation. Aucun SMS n’est envoyé.
+Node 24 ; `npm ci`, `npm run db:migrate`, `npm run build`, `npm start`. `.env.local` reste privé et exclu de Git. Les identifiants sont dans un fichier privé hors dépôt. Ne jamais inclure ces fichiers dans une archive. Mode local : `APP_MODE=connected`, `DATA_ENV=test`, `SERVICE_CONFIG_APPROVED=true` (règles provisoires de test uniquement), `SMS_ENABLED=false`.
 
-## Base de test et accès privé
+La version Vite publique et son déploiement sont conservés. La base est liée aux environnements Vercel développement/aperçu ; les paramètres du gérant sont actuellement locaux. Avant un aperçu Next.js, choisir la racine `apps/web`, installer les secrets d'accès gérant pour cet aperçu et configurer son origine HTTPS. Aucun nouveau déploiement Vercel dans cette étape.
 
-Une base Neon nommée `montady-test`, région Francfort, est créée et liée au projet Vercel `restaurant-la-tour` pour développement et aperçu uniquement. Les migrations `001-initial.sql` et `002-admin-sessions.sql` sont appliquées. Aucune réservation de démonstration ni aucun service fictif n’y est importé. La connexion utilise TLS et des paramètres secrets côté serveur.
+## Vérifications
 
-L’accès `/gerant` utilise un compte propriétaire configuré localement, un mot de passe haché avec scrypt, des sessions aléatoires de huit heures stockées sous forme hachée, un cookie HttpOnly/SameSite Strict (Secure sur HTTPS/Vercel), une vérification d’origine, une limitation à huit tentatives par quinze minutes et un journal de connexion. Déconnexion, expiration ou rotation des identifiants révoquent l’accès. La page privée consulte la base commune ; les actions complètes restent à raccorder. Le fichier privé des identifiants est hors du dépôt.
+Construction Next.js et 11 tests du moteur de démonstration réussis. `npm run test:persistent -- chemin-du-fichier-prive` vérifie contre la base de test le quota sous concurrence, les dernières places, l'anti-doublon, les accès, la confidentialité du lien, les déplacements atomiques, les révisions concurrentes, les sources/allergies et la fermeture. Recette réussie ; les essais sont annulés ensuite et le service rouvert, sans suppression d'historique. Le navigateur a également vérifié une création, son annulation et l'accès au tableau de bord.
 
-Le formulaire public utilise exclusivement le moteur de démonstration. Les créations concurrentes persistantes, les mutations du gérant, les déplacements persistants, les liens client et les SMS restent à intégrer et à tester. Localement : `APP_MODE=connected`, `DATA_ENV=test`, `SERVICE_CONFIG_APPROVED=false`, `SMS_ENABLED=false`. Les API de réservation restent désactivées. Le transport SMS échoue volontairement même si la variable est changée ; toute activation réelle exige une instruction explicite ultérieure.
+L'ancien test `test:connected` correspond à l'étape où les réservations étaient désactivées ; il reste à adapter. L'ancien test navigateur de démonstration n'a pas été relancé.
 
-`npm run db:migrate` applique les migrations avec verrou et contrôle des empreintes. `npm run admin:setup -- email chemin-vers-un-fichier-prive` crée un compte uniquement si aucun compte n’existe. `.env.local`, `.vercel` et les identifiants ne doivent jamais être ajoutés à Git ni à une archive. Une nouvelle extraction des variables Vercel remplace `.env.local` : sauvegarder les paramètres locaux de l’accès gérant avant de la faire.
+## Suite avant mise en service
 
-## Déploiement et vérifications
-
-Le code est sur la branche GitHub `codex/prototype-reservations`. Le site Vite public reste distinct et aucun nouveau déploiement n’est effectué. Avant un aperçu Next.js, choisir `apps/web` comme racine et configurer les secrets d’authentification ainsi que l’origine HTTPS pour cet aperçu. Ne jamais utiliser les identifiants de production pour ces essais. Les identifiants gérant sont actuellement configurés sur le serveur local uniquement ; les variables de base sont également liées aux environnements Vercel de test.
-
-Tests : `npm test` (11 scénarios du moteur de démonstration) ; `npm run test:connected -- chemin-vers-le-fichier-prive` vérifie contre la base de test l’accès anonyme, les origines, les identifiants, les cookies, l’expiration, la déconnexion, la limitation des tentatives et le maintien des réservations/SMS désactivés. Ces tests connectés ont réussi. La migration a également été rejouée sans recréer les tables. La construction Next.js a réussi. Les réservations persistantes et les SMS ne sont pas encore opérationnels. L’ancien test navigateur de démonstration doit être adapté au calendrier personnalisé et n’a pas été relancé dans cette étape.
-
-Photos réelles, prix du dépôt GitHub, menus JPG et accès aux originaux conservés. Chaque transcription reste à valider avant publication réelle.
+Gestion persistante de la pluie et des propositions, validation/publication des menus en base, paramétrage détaillé du gérant, prestataire et programmation des SMS, règles métier finales (capacité, durées, congés), protection contre les demandes abusives, mentions légales et politique de conservation. Aucun envoi SMS réel sans activation explicite.

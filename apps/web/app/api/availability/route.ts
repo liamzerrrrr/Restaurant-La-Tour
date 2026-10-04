@@ -1,0 +1,3 @@
+import {availability} from '../../../lib/server/services';
+export const runtime='nodejs';
+export async function GET(request:Request){const q=new URL(request.url).searchParams;const people=Number(q.get('people')||2);const preference=q.get('preference')||'interior';if(!Number.isInteger(people)||people<1||people>12||!['interior','terrace'].includes(preference))return Response.json({error:'Sélection invalide.'},{status:400});try{return Response.json(await availability(q.get('date')||'',people,preference),{headers:{'Cache-Control':'no-store'}});}catch{return Response.json({error:'Disponibilités indisponibles. Réessayez.'},{status:503});}}

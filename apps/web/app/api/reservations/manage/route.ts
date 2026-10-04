@@ -1,0 +1,6 @@
+import {allowedOrigin} from '../../../../lib/server/auth';
+import {lookupToken,modify,updateInput} from '../../../../lib/server/manage';
+import {cancelWithToken} from '../../../../lib/server/reservations';
+import {db} from '../../../../lib/server/db';
+export const runtime='nodejs';
+export async function POST(request:Request){if(!allowedOrigin(request))return Response.json({error:'Origine refusée.'},{status:403});try{const body=await request.json();const r=await lookupToken(body.token);if(body.action==='get')return Response.json(r,{headers:{'Cache-Control':'no-store'}});if(body.action==='cancel')return Response.json(await cancelWithToken(body.token));if(body.action==='move'){const [full]=await db()`SELECT * FROM reservations WHERE id=${r.id}`;return Response.json(await modify(updateInput.parse({id:r.id,revision:body.revision,serviceId:body.serviceId,startsAt:body.startsAt,people:r.people,preference:r.preference,status:r.status,name:full.name,phone:full.phone,email:full.email,comment:full.comment,allergies:full.allergies}),'client'));}throw Error('INVALID');}catch{return Response.json({error:'Lien expiré ou modification impossible. La réservation initiale est conservée si le changement échoue.'},{status:409});}}
