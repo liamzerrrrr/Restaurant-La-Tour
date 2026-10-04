@@ -35,6 +35,8 @@ Gestion persistante de la pluie et des propositions, validation/publication des 
 
 L’application Next.js est déployée depuis apps/web avec vercel.json. Les variables Neon et d’authentification sont limitées à l’environnement Preview ; SMS_ENABLED reste false. L’origine exacte du déploiement est autorisée depuis les variables système Vercel, jamais depuis l’en-tête Host du client. Le site Vite de production reste séparé.
 
-Aperçu : https://restaurant-la-tour-qk7x1iimd-tomybarbierpro-4352s-projects.vercel.app
+Aperçu : https://restaurant-la-tour-2btzjhw65-tomybarbierpro-4352s-projects.vercel.app
+
+
 
 

@@ -5,4 +5,51 @@
 @media(prefers-reduced-motion:no-preference){.revealed{animation:appear .4s ease-out}}
 @media(max-width:700px){.mobile-reserve{display:flex}}
 
+/* Menu presentation inspired by the restaurant's original site. */
+.menu-section{background:#25221e;color:#f4eade;--line:#ffffff26;--muted:#bdb4aa;--clay:#d1a58a}
+.menu-section .section-heading>p,.menu-section .muted{color:var(--muted)}
+.menu-section .warning{background:#ffffff06;border-color:#d1a58a;color:#c9bcb0}
+.menu-section .menu-tabs{gap:28px}
+.menu-tabs{scrollbar-width:none}.menu-tabs::-webkit-scrollbar{display:none}
+.menu-section .menu-tabs button{font-family:'Cormorant Garamond',Georgia,serif;font-size:25px;color:#bdb4aa;padding:16px 5px}
+.menu-section .menu-tabs .selected{color:#ead7c5!important;border-color:#d1a58a}
+.formula-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.formula-card{border:1px solid #ffffff26;padding:36px;display:flex;flex-direction:column;min-width:0}
+.formula-featured{border-color:#caa48c;background:#ffffff05}
+.formula-eyebrow{font-size:10px;letter-spacing:2.6px;color:#d1a58a;margin-bottom:25px}
+.formula-card h3{font-size:38px;margin-bottom:28px;color:#f4eade}
+.formula-courses{list-style:none;margin:0 0 24px;padding:0;display:grid;gap:13px;color:#d7cfc5;font-size:15px}
+.formula-courses li{display:flex;align-items:baseline;gap:14px}
+.formula-courses li:before{content:'';flex:0 0 12px;height:1px;background:#d1a58a;align-self:center}
+.formula-composition{font-size:12px;color:#bdb4aa;border:0;margin:0;padding:0}
+.formula-composition summary{display:inline-block;border-bottom:1px solid #ffffff26;padding-bottom:3px}
+.formula-composition p{margin:16px 0 0;line-height:1.8}
+.formula-description{color:#bdb4aa;font-size:14px;line-height:1.8}
+.formula-bottom{margin-top:auto;padding-top:36px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.formula-price{font-family:'Cormorant Garamond',Georgia,serif;font-size:44px;color:#d1a58a;line-height:1}
+.formula-note{font-size:12px;color:#bdb4aa;margin:18px 0 0;line-height:1.7}
+.menu-dishes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 56px;padding:15px 0}
+.menu-dish-heading{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.menu-dish h3{font-size:27px;color:#f4eade;margin:0;line-height:1.25}
+.price-leader{flex:1;min-width:12px;border-bottom:1px dotted #ffffff45}
+.menu-dish-price{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;white-space:nowrap;color:#d1a58a}
+.menu-dish p{font-size:14px;line-height:1.8;color:#bdb4aa;margin:0}
+.menu-section details:not(.formula-composition){color:#bdb4aa}
+@media(max-width:700px){
+ .formula-grid,.menu-dishes{grid-template-columns:1fr;gap:24px}
+ .formula-card{padding:28px;min-height:330px}
+ .formula-card h3{font-size:34px}
+ .menu-section .menu-tabs{gap:24px;margin-bottom:30px}
+ .menu-section .menu-tabs button{font-size:24px}
+ .menu-dishes{gap:35px}
+ .menu-dish h3{font-size:25px}
+ .menu-dish-price{font-size:23px}
+ .hero-photo{min-height:0;max-height:none;height:auto;aspect-ratio:3/4}
+ .story-photo{height:auto;aspect-ratio:4/5}
+ .place-photo{height:auto;aspect-ratio:4/5}
+ .place-grid article:nth-child(2) .place-photo{aspect-ratio:5/4}
+ .place-photo img{object-position:center}
+ .place-info{padding:28px 0}
+}
+
 .reservation-calendar{position:relative;margin-bottom:18px;font-size:12px;min-width:0}.date-label{display:block;font-weight:500}.date-trigger{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:8px;min-height:46px;padding:12px;border-color:#c5c5b7;white-space:nowrap}.date-panel{position:absolute;left:0;top:100%;z-index:45;width:min(310px,calc(100vw - 100px));padding:12px;background:var(--paper);border:1px solid var(--line);box-shadow:0 12px 30px #30382d25}.date-navigation{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}.date-navigation strong{text-transform:capitalize;font-size:13px}.date-navigation button{padding:4px 12px;font-size:24px;min-height:40px;border:0}.date-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}.date-weekday{font-size:11px;color:var(--muted);padding:6px 0}.date-grid button{padding:0;min-height:36px;font-size:13px;border:0}.date-grid button:disabled{color:#999b96;background:#efefeb;opacity:1}.date-grid .date-closed{color:#999b96;background:#efefeb}.date-grid .date-selected:not(:disabled){background:var(--olive);color:white}.date-grid button:hover:not(:disabled){background:#e5eadf;color:var(--ink)}.date-legend{font-size:10px;color:var(--muted);margin:12px 0 8px;line-height:1.5}.date-legend span{display:inline-block;width:9px;height:9px;background:#e0e0da;margin-right:5px}.date-dismiss{width:100%;font-size:11px;padding:8px}.date-trigger:focus-visible,.date-grid button:focus-visible{outline-offset:1px}
