@@ -1,0 +1,13 @@
+import {readFile,writeFile,access} from 'node:fs/promises';
+import {randomBytes,scryptSync} from 'node:crypto';
+const [email,credentialsPath]=process.argv.slice(2);
+if(!email||!credentialsPath||!/^\S+@\S+\.\S+$/.test(email))throw Error('Indiquer un email et un fichier local pour les identifiants.');
+const env=await readFile('.env.local','utf8');
+let exists=false;try{await access(credentialsPath);exists=true;}catch{}if(exists)throw Error('Le fichier des identifiants existe déjà : il ne sera pas écrasé.');
+if(/^ADMIN_PASSWORD_HASH=.+/m.test(env))throw Error('Un compte existe déjà. Aucune modification automatique de son mot de passe.');
+const password=randomBytes(24).toString('base64url');
+const salt=randomBytes(16).toString('hex');
+const settings={APP_MODE:'connected',DATA_ENV:'test',APP_ORIGIN:'http://localhost:3000',ADMIN_ALLOWED_ORIGINS:'http://192.168.1.15:3000',SERVICE_CONFIG_APPROVED:'false',SMS_ENABLED:'false',ADMIN_EMAIL:email.toLowerCase(),ADMIN_PASSWORD_HASH:salt+':'+scryptSync(password,salt,64).toString('hex'),AUTH_SECRET:randomBytes(48).toString('hex')};
+await writeFile('.env.local',env+'\n'+Object.entries(settings).map(([k,v])=>k+'='+JSON.stringify(v)).join('\n')+'\n',{mode:0o600});
+await writeFile(credentialsPath,`ACCES PRIVE — BASE DE TEST\n\nAdresse sur cet ordinateur : http://localhost:3000/gerant\nAdresse sur le même Wi-Fi : http://192.168.1.15:3000/gerant\nEmail : ${email.toLowerCase()}\nMot de passe : ${password}\n\nConservez ce document privé. Il ne doit pas être envoyé sur GitHub.\nLe formulaire public reste en démonstration ; aucun SMS envoyé.\n`,{mode:0o600,flag:'wx'});
+console.log('Compte de test configuré. Identifiants enregistrés dans le fichier privé demandé ; aucun secret affiché.');
