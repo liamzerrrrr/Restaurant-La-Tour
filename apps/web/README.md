@@ -40,3 +40,10 @@ Aperçu : https://restaurant-la-tour-2btzjhw65-tomybarbierpro-4352s-projects.ver
 
 
 
+
+## Bons cadeaux — essais connectés
+Le montant est libre, la validité est d'un an à compter de l'émission et les utilisations partielles déduisent le solde sans modifier l'échéance. Le gérant crée les bons fictifs et enregistre les dépenses depuis /gerant/cadeaux. Le lien privé /cadeau#code permet de consulter le solde et d'imprimer un bon de démonstration. Les montants sont stockés en centimes ; les débits sont verrouillés en transaction et les clés d'opération empêchent les doublons.
+
+Migration 004 appliquée uniquement à montady-test. Aucun paiement, achat public ou envoi d'email n'est connecté. Le destinataire d'essai autorisé est tomybarbierpro@gmail.com ; aucun email client ni SMS réel ne doit être envoyé. L'installation Resend via Marketplace demande une formule payante car une équipe existe déjà : ne pas souscrire ; connecter l'équipe existante avant de développer les envois. La gestion de la pluie est reportée.
+
+Test : node tests/gift-cards.mjs ../../../Acces-gerant.txt (uniquement DATA_ENV=test et SMS_ENABLED=false). Le test conserve un bon fictif épuisé et expiré avec son historique. Une rotation d'AUTH_SECRET nécessite de conserver les liens cadeaux déjà distribués ; elle empêche de régénérer le code d'une ancienne demande avec sa clé d'idempotence.
